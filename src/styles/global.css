@@ -1,0 +1,327 @@
+/* ============================================================
+   PORTAL SDHP — ESTILOS GLOBALES
+   Subsecretaría de Derechos Humanos y Población de Michoacán
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── TOKENS ── */
+:root {
+  --color-guinda:       #4A001F;
+  --color-guinda-dark:  #2E0013;
+  --color-guinda-light: #6B0030;
+  --color-morado:       #6A0F49;
+  --color-rosa:         #FFC3D0;
+  --color-rosa-light:   #FFE8EE;
+  --color-rosa-dark:    #F097AF;
+  --color-salvia:       #6D807F;
+  --color-salvia-light: #D4DEDD;
+  --color-fondo:        #FAF7F8;
+  --color-fondo-alt:    #F3EEF0;
+  --color-texto:        #1A0A0F;
+  --color-texto-muted:  #5A4550;
+  --color-blanco:       #FFFFFF;
+
+  /* Semáforo */
+  --semaforo-verde:     #2D7A4F;
+  --semaforo-amarillo:  #C87C00;
+  --semaforo-rojo:      #B91C1C;
+
+  /* Tipografía */
+  --font-display: 'Nunito', 'Trebuchet MS', sans-serif;
+  --font-body:    'DM Sans', 'Segoe UI', sans-serif;
+
+  /* Escala tipográfica */
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+  --text-5xl:  3rem;
+
+  /* Espaciado */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Radios */
+  --radius-sm:   0.5rem;
+  --radius-md:   1rem;
+  --radius-lg:   1.5rem;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 3px rgba(74,0,31,0.08), 0 1px 2px rgba(74,0,31,0.04);
+  --shadow-md: 0 4px 16px rgba(74,0,31,0.10), 0 2px 6px rgba(74,0,31,0.06);
+  --shadow-lg: 0 10px 40px rgba(74,0,31,0.14), 0 4px 12px rgba(74,0,31,0.08);
+
+  /* Transiciones */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* Contenedor */
+  --container-max: 1200px;
+  --container-pad: clamp(1rem, 4vw, 2.5rem);
+}
+
+/* ── RESET ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: var(--color-texto);
+  background-color: var(--color-fondo);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+img, video, svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--color-guinda);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-morado);
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  color: var(--color-guinda);
+}
+
+/* ── ACCESIBILIDAD ── */
+:focus-visible {
+  outline: 3px solid var(--color-rosa-dark);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ── UTILIDADES ── */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-center { text-align: center; }
+.text-display { font-family: var(--font-display); }
+
+/* ── BOTONES ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-base);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--color-guinda);
+  color: var(--color-blanco);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--color-guinda-dark);
+  color: var(--color-blanco);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-rosa-light);
+  color: var(--color-guinda);
+  border: 2px solid var(--color-rosa-dark);
+}
+
+.btn-secondary:hover {
+  background: var(--color-rosa);
+  color: var(--color-guinda-dark);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-blanco);
+  border: 2px solid rgba(255,255,255,0.6);
+}
+
+.btn-outline:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--color-blanco);
+  border-color: rgba(255,255,255,0.9);
+}
+
+/* ── TARJETAS ── */
+.card {
+  background: var(--color-blanco);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ── SECCIONES ── */
+.section {
+  padding-block: var(--space-24);
+}
+
+.section-alt {
+  background: var(--color-fondo-alt);
+}
+
+.section-dark {
+  background: var(--color-guinda);
+  color: var(--color-blanco);
+}
+
+.section-dark h1,
+.section-dark h2,
+.section-dark h3 {
+  color: var(--color-rosa-light);
+}
+
+.section-title {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  margin-bottom: var(--space-3);
+}
+
+.section-subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-texto-muted);
+  max-width: 60ch;
+  margin-inline: auto;
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge-verde    { background: #D1FAE5; color: var(--semaforo-verde); }
+.badge-amarillo { background: #FEF3C7; color: var(--semaforo-amarillo); }
+.badge-rojo     { background: #FEE2E2; color: var(--semaforo-rojo); }
+.badge-rosa     { background: var(--color-rosa-light); color: var(--color-guinda); }
+
+/* ── GRID RESPONSIVO ── */
+.grid-2 { display: grid; gap: var(--space-8); }
+.grid-3 { display: grid; gap: var(--space-6); }
+
+@media (min-width: 640px) {
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 768px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── ANIMACIONES ── */
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.5; }
+  50%  { transform: scale(1.08); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease forwards;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  width: 4rem;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-guinda), var(--color-rosa-dark));
+  border-radius: var(--radius-full);
+  margin-block: var(--space-4);
+}
+
+.divider-center { margin-inline: auto; }

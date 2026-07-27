@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Página no encontrada">
+  <section class="error-section" aria-label="Página no encontrada">
+    <div class="container text-center">
+      <div class="error-emoji" aria-hidden="true">🔍</div>
+      <h1>Página no encontrada</h1>
+      <p>Lo sentimos, la página que buscas no existe o fue movida.</p>
+      <a href="/" class="btn btn-primary" style="margin-top:var(--space-8)">
+        Ir al inicio →
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .error-section {
+    padding-block: var(--space-24);
+  }
+  .error-emoji { font-size: 5rem; margin-bottom: var(--space-6); }
+  h1 { font-size: var(--text-4xl); margin-bottom: var(--space-4); }
+  p { color: var(--color-texto-muted); font-size: var(--text-lg); }
+</style>

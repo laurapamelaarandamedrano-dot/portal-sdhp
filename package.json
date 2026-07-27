@@ -1,0 +1,14 @@
+{
+  "name": "portal-sdhp",
+  "version": "1.0.0",
+  "description": "Portal Institucional - Subsecretaría de Derechos Humanos y Población de Michoacán",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^4.16.0"
+  }
+}

@@ -1,0 +1,86 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description = 'Subsecretaría de Derechos Humanos y Población de Michoacán — Consulta el avance de tu recomendación CEDH/CNDH, accede a cursos de derechos humanos y conoce nuestros servicios.',
+  ogImage = '/og-default.png'
+} = Astro.props;
+
+const siteTitle = title === 'Inicio'
+  ? 'Subsecretaría de Derechos Humanos y Población | Michoacán'
+  : `${title} | Subsecretaría DDHH Michoacán`;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4A001F" />
+
+  <!-- SEO -->
+  <title>{siteTitle}</title>
+  <meta name="description" content={description} />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href={Astro.url} />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content={siteTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content={Astro.url} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:locale" content="es_MX" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={siteTitle} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Favicon placeholder -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Preconnect fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+  <a href="#contenido-principal" class="skip-link">Ir al contenido principal</a>
+  <Nav />
+  <main id="contenido-principal">
+    <slot />
+  </main>
+  <Footer />
+</body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    background: var(--color-guinda);
+    color: var(--color-blanco);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-decoration: none;
+    z-index: 9999;
+    transition: top var(--transition-fast);
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+</style>

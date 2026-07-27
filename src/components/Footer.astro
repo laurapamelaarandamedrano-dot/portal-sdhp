@@ -1,0 +1,159 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Identidad -->
+      <div class="footer-brand">
+        <p class="footer-brand-name">Subsecretaría de Derechos Humanos y Población</p>
+        <p class="footer-brand-dep">Secretaría de Gobierno del Estado de Michoacán</p>
+        <p class="footer-brand-desc">
+          Defendemos y promovemos los derechos humanos de todas las personas
+          que habitan el estado de Michoacán.
+        </p>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <nav class="footer-nav" aria-label="Mapa del sitio">
+        <p class="footer-nav-title">Accesos rápidos</p>
+        <ul>
+          <li><a href="/semaforo">Consultar mi recomendación</a></li>
+          <li><a href="/cursos">Cursos de Derechos Humanos</a></li>
+          <li><a href="/nosotros">Quiénes somos</a></li>
+          <li><a href="/contacto">Contacto</a></li>
+        </ul>
+      </nav>
+
+      <!-- Legal / normas -->
+      <nav class="footer-nav" aria-label="Marco legal">
+        <p class="footer-nav-title">Marco normativo</p>
+        <ul>
+          <li><a href="https://congresomich.gob.mx" target="_blank" rel="noopener">Legislación estatal</a></li>
+          <li><a href="https://www.cndh.org.mx" target="_blank" rel="noopener">CNDH</a></li>
+          <li><a href="#" >Aviso de privacidad</a></li>
+          <li><a href="#" >Transparencia</a></li>
+        </ul>
+      </nav>
+
+      <!-- Contacto rápido -->
+      <div class="footer-contact">
+        <p class="footer-nav-title">Contáctanos</p>
+        <address>
+          <p>📍 Morelia, Michoacán</p>
+          <p>📧 <a href="mailto:ddhh@michoacan.gob.mx">ddhh@michoacan.gob.mx</a></p>
+          <p>📞 <a href="tel:+524431234567">(443) 123-4567</a></p>
+        </address>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p>© {currentYear} Subsecretaría de Derechos Humanos y Población — Gobierno de Michoacán</p>
+      <p class="footer-bottom-right">
+        Sitio desarrollado con estándares de accesibilidad WCAG 2.1 AA
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-guinda-dark);
+    color: rgba(255,255,255,0.75);
+    padding-block: var(--space-16) var(--space-8);
+    margin-top: auto;
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: var(--space-8);
+    grid-template-columns: 1fr;
+    margin-bottom: var(--space-12);
+  }
+
+  @media (min-width: 640px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  }
+
+  .footer-brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--text-lg);
+    color: var(--color-blanco);
+    margin-bottom: var(--space-1);
+  }
+
+  .footer-brand-dep {
+    font-size: var(--text-sm);
+    color: var(--color-rosa);
+    margin-bottom: var(--space-4);
+  }
+
+  .footer-brand-desc {
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    max-width: 28ch;
+  }
+
+  .footer-nav-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-rosa);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: var(--space-4);
+  }
+
+  .footer-nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer-nav a {
+    font-size: var(--text-sm);
+    color: rgba(255,255,255,0.70);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  .footer-nav a:hover {
+    color: var(--color-rosa-light);
+  }
+
+  .footer-contact address {
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .footer-contact a {
+    color: rgba(255,255,255,0.70);
+    text-decoration: none;
+  }
+
+  .footer-contact a:hover {
+    color: var(--color-rosa-light);
+  }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.10);
+    padding-top: var(--space-6);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: rgba(255,255,255,0.45);
+  }
+</style>

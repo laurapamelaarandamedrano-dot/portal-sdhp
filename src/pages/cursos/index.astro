@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const cursos = [
+  {
+    slug: 'introduccion-derechos-humanos',
+    titulo: 'Introducción a los Derechos Humanos',
+    emoji: '⚖️',
+    descripcion: 'Aprende qué son los derechos humanos, su historia, sus características y cómo te protegen en tu vida diaria.',
+    modulos: 6,
+    horas: 3,
+    nivel: 'Básico',
+    disponible: true,
+    temas: ['Conceptos fundamentales', 'Historia y evolución', 'Sistemas de protección', 'Tus derechos hoy'],
+  },
+  {
+    slug: 'mecanismos-queja',
+    titulo: 'Mecanismos de queja y denuncia',
+    emoji: '👩‍⚖️',
+    descripcion: 'Conoce cómo presentar una queja ante la CEDH y CNDH, qué documentos necesitas y cuáles son tus plazos.',
+    modulos: 4,
+    horas: 2,
+    nivel: 'Básico',
+    disponible: false,
+    temas: ['Cómo presentar una queja', 'Documentación requerida', 'Plazos y seguimiento'],
+  },
+  {
+    slug: 'derechos-migrantes',
+    titulo: 'Derechos de las personas migrantes',
+    emoji: '🌍',
+    descripcion: 'Marco internacional, protecciones especiales y recursos disponibles para personas migrantes en Michoacán.',
+    modulos: 5,
+    horas: 2.5,
+    nivel: 'Básico',
+    disponible: false,
+    temas: ['Marco internacional', 'Protecciones especiales', 'Recursos disponibles'],
+  },
+  {
+    slug: 'derechos-ninez',
+    titulo: 'Derechos de niñas, niños y adolescentes',
+    emoji: '👧',
+    descripcion: 'Protección especial, convención de los derechos del niño y mecanismos de denuncia.',
+    modulos: 5,
+    horas: 2.5,
+    nivel: 'Básico',
+    disponible: false,
+    temas: ['Convención internacional', 'Protección especial', 'Mecanismos de denuncia'],
+  },
+];
+---
+
+<BaseLayout
+  title="Cursos de Derechos Humanos"
+  description="Cursos gratuitos e interactivos de derechos humanos para ciudadanía general. Obtén constancia PDF al concluir cada curso."
+>
+
+  <section class="cursos-hero" aria-label="Catálogo de cursos">
+    <div class="container">
+      <span class="badge badge-rosa">Formación gratuita</span>
+      <h1 class="cursos-hero-title">Cursos de Derechos Humanos</h1>
+      <p class="cursos-hero-desc">
+        Aprende sobre tus derechos sin requisitos previos, a tu ritmo, y obtén
+        una constancia digital al completar cada curso.
+      </p>
+      <div class="cursos-hero-stats">
+        <span>📖 {cursos.length} cursos</span>
+        <span>🆓 100% gratuitos</span>
+        <span>📄 Constancia incluida</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-label="Lista de cursos">
+    <div class="container">
+      <div class="cursos-list">
+        {cursos.map((curso) => (
+          <article class:list={['curso-item', { 'curso-item-disponible': curso.disponible, 'curso-item-pronto': !curso.disponible }]}>
+            <div class="curso-item-emoji" aria-hidden="true">{curso.emoji}</div>
+
+            <div class="curso-item-body">
+              <div class="curso-item-meta-top">
+                <span class:list={['badge', curso.disponible ? 'badge-rosa' : 'badge-muted']}>
+                  {curso.disponible ? 'Disponible ahora' : 'Próximamente'}
+                </span>
+                <span class="curso-item-nivel">{curso.nivel}</span>
+              </div>
+
+              <h2 class="curso-item-title">{curso.titulo}</h2>
+              <p class="curso-item-desc">{curso.descripcion}</p>
+
+              <ul class="curso-item-temas" aria-label="Temas del curso">
+                {curso.temas.map(t => <li>✓ {t}</li>)}
+              </ul>
+
+              <div class="curso-item-footer">
+                <div class="curso-item-info">
+                  <span>{curso.modulos} módulos</span>
+                  <span>~{curso.horas} horas</span>
+                </div>
+                {curso.disponible
+                  ? <a href={`/cursos/${curso.slug}`} class="btn btn-primary">Comenzar →</a>
+                  : <button class="btn btn-secondary" disabled style="opacity:0.6;cursor:not-allowed">Próximamente</button>
+                }
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .cursos-hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
+    padding-block: var(--space-16);
+    text-align: center;
+  }
+
+  .cursos-hero-title {
+    font-size: clamp(var(--text-2xl), 4vw, var(--text-4xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    margin-block: var(--space-4);
+  }
+
+  .cursos-hero-desc {
+    color: rgba(255,255,255,0.80);
+    max-width: 52ch;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+    line-height: 1.6;
+    margin-bottom: var(--space-6);
+  }
+
+  .cursos-hero-stats {
+    display: flex;
+    gap: var(--space-6);
+    justify-content: center;
+    flex-wrap: wrap;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-rosa-light);
+  }
+
+  /* Lista de cursos */
+  .cursos-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: 860px;
+    margin-inline: auto;
+  }
+
+  .curso-item {
+    display: grid;
+    gap: var(--space-6);
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    border: 2px solid transparent;
+  }
+
+  @media (min-width: 640px) {
+    .curso-item { grid-template-columns: 80px 1fr; }
+  }
+
+  .curso-item-disponible {
+    border-color: var(--color-guinda);
+  }
+
+  .curso-item-disponible:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .curso-item-pronto {
+    opacity: 0.80;
+  }
+
+  .curso-item-emoji {
+    font-size: 3rem;
+    line-height: 1;
+    align-self: flex-start;
+  }
+
+  .curso-item-meta-top {
+    display: flex;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .badge-muted {
+    background: var(--color-salvia-light);
+    color: var(--color-salvia);
+  }
+
+  .curso-item-nivel {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-texto-muted);
+  }
+
+  .curso-item-title {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    margin-bottom: var(--space-2);
+    color: var(--color-guinda);
+  }
+
+  .curso-item-desc {
+    color: var(--color-texto-muted);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+  }
+
+  .curso-item-temas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .curso-item-temas li {
+    font-size: var(--text-xs);
+    font-family: var(--font-display);
+    font-weight: 600;
+    background: var(--color-rosa-light);
+    color: var(--color-guinda);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .curso-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .curso-item-info {
+    display: flex;
+    gap: var(--space-4);
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+</style>

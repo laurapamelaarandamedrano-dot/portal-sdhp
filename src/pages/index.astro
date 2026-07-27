@@ -1,0 +1,656 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Inicio"
+  description="Portal de la Subsecretaría de Derechos Humanos y Población de Michoacán. Consulta tu recomendación CEDH/CNDH, accede a cursos gratuitos y conoce tus derechos."
+>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" aria-label="Bienvenida">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-content">
+      <div class="hero-text">
+        <span class="hero-eyebrow">Subsecretaría de Derechos Humanos y Población</span>
+        <h1 class="hero-title">
+          Tus derechos,<br />
+          <span class="hero-title-accent">transparentes y al alcance</span>
+        </h1>
+        <p class="hero-desc">
+          Consulta en tiempo real el avance de tu recomendación CEDH o CNDH,
+          capacítate en derechos humanos de forma gratuita y conoce cómo trabajamos
+          para ti desde Michoacán.
+        </p>
+        <div class="hero-actions">
+          <a href="/semaforo" class="btn btn-primary hero-btn-main">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Consultar mi caso
+          </a>
+          <a href="/cursos" class="btn btn-outline hero-btn-sec">
+            Ver cursos gratuitos →
+          </a>
+        </div>
+      </div>
+
+      <!-- Semáforo decorativo / preview -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="semaforo-preview">
+          <div class="sp-label">Estado de recomendaciones</div>
+          <div class="sp-items">
+            <div class="sp-item sp-verde">
+              <div class="sp-dot">
+                <div class="sp-ring"></div>
+              </div>
+              <div>
+                <div class="sp-item-title">Cumplida</div>
+                <div class="sp-item-sub">Recomendación atendida</div>
+              </div>
+            </div>
+            <div class="sp-item sp-amarillo">
+              <div class="sp-dot">
+                <div class="sp-ring"></div>
+              </div>
+              <div>
+                <div class="sp-item-title">En proceso</div>
+                <div class="sp-item-sub">Seguimiento activo</div>
+              </div>
+            </div>
+            <div class="sp-item sp-rojo">
+              <div class="sp-dot">
+                <div class="sp-ring"></div>
+              </div>
+              <div>
+                <div class="sp-item-title">Pendiente</div>
+                <div class="sp-item-sub">Requiere atención</div>
+              </div>
+            </div>
+          </div>
+          <a href="/semaforo" class="sp-cta">Consultar número de expediente →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Olas decorativas -->
+    <div class="hero-wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FAF7F8"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══════════════ ACCESOS RÁPIDOS ══════════════ -->
+  <section class="section quick-access" aria-label="Servicios principales">
+    <div class="container">
+      <h2 class="sr-only">Servicios principales</h2>
+      <div class="qa-grid">
+
+        <a href="/semaforo" class="qa-card qa-card-guinda">
+          <div class="qa-icon" aria-hidden="true">🔍</div>
+          <h3>Consulta tu recomendación</h3>
+          <p>Sigue en tiempo real el avance de tu recomendación CEDH o CNDH.</p>
+          <span class="qa-link">Consultar ahora →</span>
+        </a>
+
+        <a href="/cursos" class="qa-card qa-card-morado">
+          <div class="qa-icon" aria-hidden="true">📚</div>
+          <h3>Cursos de Derechos Humanos</h3>
+          <p>Aprende sobre tus derechos con cursos gratuitos e interactivos. Obtén constancia.</p>
+          <span class="qa-link">Ver catálogo →</span>
+        </a>
+
+        <a href="/nosotros" class="qa-card qa-card-salvia">
+          <div class="qa-icon" aria-hidden="true">🏛️</div>
+          <h3>Conoce la Subsecretaría</h3>
+          <p>Quiénes somos, qué hacemos y el marco normativo que nos rige.</p>
+          <span class="qa-link">Conocer más →</span>
+        </a>
+
+        <a href="/contacto" class="qa-card qa-card-rosa">
+          <div class="qa-icon" aria-hidden="true">💬</div>
+          <h3>Contáctanos</h3>
+          <p>¿Tienes una duda o denuncia? Estamos aquí para escucharte.</p>
+          <span class="qa-link">Escribirnos →</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CURSOS DESTACADOS ══════════════ -->
+  <section class="section section-alt" aria-label="Cursos destacados">
+    <div class="container">
+      <div class="text-center">
+        <span class="badge badge-rosa">Formación gratuita</span>
+        <h2 class="section-title" style="margin-top:var(--space-3)">Aprende sobre tus derechos</h2>
+        <div class="divider divider-center"></div>
+        <p class="section-subtitle">
+          Cursos diseñados para ciudadanía general. Sin requisitos previos, en tu propio ritmo,
+          con constancia digital al terminar.
+        </p>
+      </div>
+
+      <div class="cursos-grid" style="margin-top:var(--space-12)">
+
+        <!-- Curso 1 — El que ya tiene contenido -->
+        <article class="curso-card curso-featured">
+          <div class="curso-badge">Disponible ahora</div>
+          <div class="curso-icon" aria-hidden="true">⚖️</div>
+          <h3 class="curso-title">Introducción a los Derechos Humanos</h3>
+          <p class="curso-desc">
+            ¿Qué son los derechos humanos? ¿Cómo te protegen? Aprende los fundamentos
+            en 6 módulos interactivos con quiz y constancia PDF al finalizar.
+          </p>
+          <div class="curso-meta">
+            <span>6 módulos</span>
+            <span>~3 horas</span>
+            <span>Constancia incluida</span>
+          </div>
+          <a href="/cursos/introduccion-derechos-humanos" class="btn btn-primary" style="margin-top:var(--space-4)">
+            Comenzar curso →
+          </a>
+        </article>
+
+        <!-- Próximos cursos -->
+        <article class="curso-card curso-pronto">
+          <div class="curso-badge curso-badge-muted">Próximamente</div>
+          <div class="curso-icon" aria-hidden="true">👩‍⚖️</div>
+          <h3 class="curso-title">Mecanismos de queja y denuncia</h3>
+          <p class="curso-desc">
+            Conoce cómo presentar una queja ante la CEDH y CNDH, qué documentos necesitas
+            y cuáles son tus plazos.
+          </p>
+          <div class="curso-meta">
+            <span>4 módulos</span>
+            <span>~2 horas</span>
+          </div>
+          <button class="btn btn-secondary" disabled style="margin-top:var(--space-4);opacity:0.6;cursor:not-allowed;">
+            Próximamente
+          </button>
+        </article>
+
+        <article class="curso-card curso-pronto">
+          <div class="curso-badge curso-badge-muted">Próximamente</div>
+          <div class="curso-icon" aria-hidden="true">🌍</div>
+          <h3 class="curso-title">Derechos de las personas migrantes</h3>
+          <p class="curso-desc">
+            Marco internacional, protecciones especiales y recursos disponibles para
+            personas migrantes en Michoacán.
+          </p>
+          <div class="curso-meta">
+            <span>5 módulos</span>
+            <span>~2.5 horas</span>
+          </div>
+          <button class="btn btn-secondary" disabled style="margin-top:var(--space-4);opacity:0.6;cursor:not-allowed;">
+            Próximamente
+          </button>
+        </article>
+
+      </div>
+
+      <div class="text-center" style="margin-top:var(--space-12)">
+        <a href="/cursos" class="btn btn-secondary">Ver todos los cursos →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CIFRAS / IMPACTO ══════════════ -->
+  <section class="section section-dark" aria-label="Cifras de impacto">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-number">+500</span>
+          <span class="stat-label">Recomendaciones en seguimiento</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">24 hrs</span>
+          <span class="stat-label">Tiempo máximo de respuesta inicial</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">Gratuito</span>
+          <span class="stat-label">Todos nuestros cursos y servicios</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">CEDH + CNDH</span>
+          <span class="stat-label">Recomendaciones que damos seguimiento</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CTA FINAL ══════════════ -->
+  <section class="section cta-section" aria-label="Llamada a la acción">
+    <div class="container text-center">
+      <h2 class="section-title">¿Tienes una recomendación activa?</h2>
+      <div class="divider divider-center"></div>
+      <p class="section-subtitle" style="margin-top:var(--space-3)">
+        Consulta su estado en tiempo real. Sin trámites, sin esperas, sin burocracia.
+        Solo ingresa tu número de expediente.
+      </p>
+      <div style="margin-top:var(--space-8);display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
+        <a href="/semaforo" class="btn btn-primary" style="font-size:var(--text-lg);padding:var(--space-4) var(--space-8);">
+          Consultar ahora
+        </a>
+        <a href="/contacto" class="btn btn-secondary">Necesito ayuda</a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 60%, #3D0A2E 100%);
+    padding-block: var(--space-24) 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(255,195,208,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(106,15,73,0.4) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    display: grid;
+    gap: var(--space-12);
+    align-items: center;
+    padding-bottom: var(--space-16);
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (min-width: 900px) {
+    .hero-content { grid-template-columns: 1fr 1fr; }
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-rosa);
+    background: rgba(255,195,208,0.12);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+    border: 1px solid rgba(255,195,208,0.25);
+  }
+
+  .hero-title {
+    font-size: clamp(var(--text-3xl), 5vw, var(--text-5xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title-accent {
+    color: var(--color-rosa);
+  }
+
+  .hero-desc {
+    font-size: var(--text-lg);
+    color: rgba(255,255,255,0.80);
+    max-width: 46ch;
+    margin-bottom: var(--space-8);
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .hero-btn-main {
+    background: var(--color-rosa);
+    color: var(--color-guinda);
+    font-size: var(--text-lg);
+    padding: var(--space-4) var(--space-8);
+  }
+
+  .hero-btn-main:hover {
+    background: var(--color-blanco);
+    color: var(--color-guinda-dark);
+  }
+
+  .hero-btn-sec {
+    font-size: var(--text-base);
+  }
+
+  /* Semáforo preview */
+  .semaforo-preview {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,195,208,0.20);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    backdrop-filter: blur(8px);
+    max-width: 400px;
+  }
+
+  .sp-label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-rosa);
+    margin-bottom: var(--space-6);
+  }
+
+  .sp-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .sp-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--color-blanco);
+  }
+
+  .sp-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sp-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid;
+    animation: pulse-ring 2.5s ease-in-out infinite;
+    opacity: 0.4;
+  }
+
+  .sp-verde  .sp-dot { background: var(--semaforo-verde); }
+  .sp-verde  .sp-ring { border-color: var(--semaforo-verde); animation-delay: 0s; }
+
+  .sp-amarillo .sp-dot { background: var(--semaforo-amarillo); }
+  .sp-amarillo .sp-ring { border-color: var(--semaforo-amarillo); animation-delay: 0.8s; }
+
+  .sp-rojo .sp-dot { background: var(--semaforo-rojo); }
+  .sp-rojo .sp-ring { border-color: var(--semaforo-rojo); animation-delay: 1.6s; }
+
+  .sp-item-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-base);
+  }
+
+  .sp-item-sub {
+    font-size: var(--text-xs);
+    color: rgba(255,255,255,0.55);
+  }
+
+  .sp-cta {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-rosa);
+    text-decoration: none;
+    border-top: 1px solid rgba(255,195,208,0.15);
+    display: block;
+    padding-top: var(--space-4);
+    transition: color var(--transition-fast);
+  }
+
+  .sp-cta:hover {
+    color: var(--color-rosa-light);
+  }
+
+  .hero-wave {
+    line-height: 0;
+    margin-top: -1px;
+  }
+
+  .hero-wave svg { width: 100%; height: 80px; }
+
+  /* ── ACCESOS RÁPIDOS ── */
+  .quick-access {
+    padding-top: var(--space-12);
+  }
+
+  .qa-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .qa-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .qa-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .qa-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    border: 2px solid transparent;
+  }
+
+  .qa-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .qa-card h3 {
+    font-size: var(--text-lg);
+    font-weight: 800;
+  }
+
+  .qa-card p {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .qa-link {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+
+  .qa-icon { font-size: 2rem; }
+
+  .qa-card-guinda {
+    background: var(--color-guinda);
+    color: var(--color-blanco);
+    border-color: var(--color-guinda-light);
+  }
+  .qa-card-guinda h3, .qa-card-guinda .qa-link { color: var(--color-rosa-light); }
+  .qa-card-guinda p { color: rgba(255,255,255,0.80); }
+
+  .qa-card-morado {
+    background: var(--color-morado);
+    color: var(--color-blanco);
+    border-color: #8B1A6B;
+  }
+  .qa-card-morado h3, .qa-card-morado .qa-link { color: var(--color-rosa-light); }
+  .qa-card-morado p { color: rgba(255,255,255,0.80); }
+
+  .qa-card-salvia {
+    background: var(--color-salvia-light);
+    border-color: var(--color-salvia);
+    color: var(--color-guinda-dark);
+  }
+  .qa-card-salvia h3, .qa-card-salvia .qa-link { color: var(--color-guinda); }
+
+  .qa-card-rosa {
+    background: var(--color-rosa-light);
+    border-color: var(--color-rosa);
+    color: var(--color-guinda-dark);
+  }
+  .qa-card-rosa h3, .qa-card-rosa .qa-link { color: var(--color-guinda); }
+
+  /* ── CURSOS ── */
+  .cursos-grid {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .cursos-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  }
+
+  .curso-card {
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all var(--transition-base);
+  }
+
+  .curso-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .curso-featured {
+    border: 2px solid var(--color-guinda);
+    background: linear-gradient(135deg, #fff 60%, var(--color-rosa-light) 100%);
+  }
+
+  .curso-pronto {
+    opacity: 0.85;
+  }
+
+  .curso-badge {
+    display: inline-flex;
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-guinda);
+    color: var(--color-rosa-light);
+    margin-bottom: var(--space-4);
+  }
+
+  .curso-badge-muted {
+    background: var(--color-salvia-light);
+    color: var(--color-salvia);
+  }
+
+  .curso-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .curso-title {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    margin-bottom: var(--space-3);
+    color: var(--color-guinda);
+  }
+
+  .curso-desc {
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .curso-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .curso-meta span {
+    font-size: var(--text-xs);
+    font-family: var(--font-display);
+    font-weight: 600;
+    background: var(--color-fondo-alt);
+    color: var(--color-texto-muted);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── STATS ── */
+  .stats-grid {
+    display: grid;
+    gap: var(--space-8);
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  @media (min-width: 640px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,195,208,0.15);
+  }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 900;
+    color: var(--color-rosa);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: var(--text-sm);
+    color: rgba(255,255,255,0.65);
+    line-height: 1.4;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: linear-gradient(135deg, var(--color-rosa-light) 0%, var(--color-fondo) 60%);
+  }
+
+  .cta-section .section-title,
+  .cta-section .section-subtitle {
+    color: var(--color-guinda);
+  }
+
+  .cta-section .section-subtitle {
+    color: var(--color-texto-muted);
+  }
+</style>
