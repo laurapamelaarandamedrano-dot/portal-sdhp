@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/url';
 ---
 
 <BaseLayout title="Página no encontrada">
@@ -8,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="error-emoji" aria-hidden="true">🔍</div>
       <h1>Página no encontrada</h1>
       <p>Lo sentimos, la página que buscas no existe o fue movida.</p>
-      <a href="/" class="btn btn-primary" style="margin-top:var(--space-8)">
+      <a href={withBase('/')} class="btn btn-primary" style="margin-top:var(--space-8)">
         Ir al inicio →
       </a>
     </div>

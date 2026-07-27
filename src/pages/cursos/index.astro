@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../utils/url';
 
 const cursos = [
   {
@@ -98,7 +99,7 @@ const cursos = [
                   <span>~{curso.horas} horas</span>
                 </div>
                 {curso.disponible
-                  ? <a href={`/cursos/${curso.slug}`} class="btn btn-primary">Comenzar →</a>
+                  ? <a href={withBase(`/cursos/${curso.slug}`)} class="btn btn-primary">Comenzar →</a>
                   : <button class="btn btn-secondary" disabled style="opacity:0.6;cursor:not-allowed">Próximamente</button>
                 }
               </div>

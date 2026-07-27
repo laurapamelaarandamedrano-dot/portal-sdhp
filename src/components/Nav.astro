@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/url';
+
 const navLinks = [
   { href: '/',           label: 'Inicio' },
   { href: '/semaforo',   label: 'Mis Recomendaciones' },
@@ -8,14 +10,16 @@ const navLinks = [
 ];
 
 const currentPath = Astro.url.pathname;
-const isActive = (href: string) =>
-  href === '/' ? currentPath === '/' : currentPath.startsWith(href);
+const isActive = (href: string) => {
+  const full = withBase(href);
+  return href === '/' ? currentPath === full : currentPath.startsWith(full);
+};
 ---
 
 <header class="nav-header" role="banner">
   <div class="container nav-inner">
     <!-- Logo + nombre -->
-    <a href="/" class="nav-brand" aria-label="Ir al inicio — Subsecretaría de Derechos Humanos y Población">
+    <a href={withBase('/')} class="nav-brand" aria-label="Ir al inicio — Subsecretaría de Derechos Humanos y Población">
       <div class="nav-logo-mark" aria-hidden="true">
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="40">
           <!-- Escudo simplificado / placeholder identidad visual -->
@@ -37,14 +41,14 @@ const isActive = (href: string) =>
     <nav class="nav-links" aria-label="Navegación principal">
       {navLinks.map(link => (
         <a
-          href={link.href}
+          href={withBase(link.href)}
           class:list={['nav-link', { 'nav-link-active': isActive(link.href) }]}
           aria-current={isActive(link.href) ? 'page' : undefined}
         >
           {link.label}
         </a>
       ))}
-      <a href="/semaforo" class="btn btn-primary nav-cta">
+      <a href={withBase('/semaforo')} class="btn btn-primary nav-cta">
         Consultar mi caso
       </a>
     </nav>
@@ -66,7 +70,7 @@ const isActive = (href: string) =>
     <nav aria-label="Navegación móvil">
       {navLinks.map(link => (
         <a
-          href={link.href}
+          href={withBase(link.href)}
           class:list={['mobile-link', { 'mobile-link-active': isActive(link.href) }]}
           aria-current={isActive(link.href) ? 'page' : undefined}
         >
@@ -74,7 +78,7 @@ const isActive = (href: string) =>
         </a>
       ))}
       <div class="mobile-cta">
-        <a href="/semaforo" class="btn btn-primary" style="width:100%;justify-content:center;">
+        <a href={withBase('/semaforo')} class="btn btn-primary" style="width:100%;justify-content:center;">
           Consultar mi caso
         </a>
       </div>

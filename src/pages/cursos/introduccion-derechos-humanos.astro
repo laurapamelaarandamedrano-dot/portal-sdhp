@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../utils/url';
 
 const curso = {
   titulo: 'Introducción a los Derechos Humanos',
@@ -148,7 +149,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   <!-- Header del curso -->
   <section class="curso-hero" aria-label="Información del curso">
     <div class="container">
-      <a href="/cursos" class="curso-back">← Regresar al catálogo</a>
+      <a href={withBase('/cursos')} class="curso-back">← Regresar al catálogo</a>
       <div class="curso-hero-inner">
         <div class="curso-hero-emoji" aria-hidden="true">{curso.emoji}</div>
         <div>
@@ -291,7 +292,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
               <button class="btn btn-primary" onclick="descargarConstancia()">
                 📄 Descargar constancia PDF
               </button>
-              <a href="/cursos" class="btn btn-secondary">Ver más cursos</a>
+              <a href={withBase('/cursos')} class="btn btn-secondary">Ver más cursos</a>
             </div>
           </div>
           <!-- Vista previa constancia -->

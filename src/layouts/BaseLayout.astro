@@ -1,6 +1,7 @@
 ---
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import { withBase } from '../utils/url';
 import '../styles/global.css';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 const {
   title,
   description = 'Subsecretaría de Derechos Humanos y Población de Michoacán — Consulta el avance de tu recomendación CEDH/CNDH, accede a cursos de derechos humanos y conoce nuestros servicios.',
-  ogImage = '/og-default.png'
+  ogImage = withBase('/og-default.png')
 } = Astro.props;
 
 const siteTitle = title === 'Inicio'
@@ -48,7 +49,7 @@ const siteTitle = title === 'Inicio'
   <meta name="twitter:image" content={ogImage} />
 
   <!-- Favicon placeholder -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 
   <!-- Preconnect fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

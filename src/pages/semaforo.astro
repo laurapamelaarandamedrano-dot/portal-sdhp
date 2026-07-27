@@ -97,6 +97,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 <!-- Datos demo (en producción vendrán de API/CMS) -->
 <script>
+  import { withBase } from '../utils/url';
+
   // Datos demo — reemplazar con fetch a API real
   const datosDemo: Record<string, {
     tipo: string;
@@ -175,7 +177,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const datos = datosDemo[numExp];
 
     if (!datos) {
-      mostrarError(`No encontramos el expediente <strong>${numExp}</strong>. Verifica que el número esté escrito correctamente tal como aparece en tu documento oficial. Si el problema persiste, <a href="/contacto">contáctanos</a>.`, area);
+      mostrarError(`No encontramos el expediente <strong>${numExp}</strong>. Verifica que el número esté escrito correctamente tal como aparece en tu documento oficial. Si el problema persiste, <a href="${withBase('/contacto')}">contáctanos</a>.`, area);
       return;
     }
 

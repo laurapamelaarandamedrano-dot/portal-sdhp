@@ -1,4 +1,5 @@
 ---
+import { withBase } from '../utils/url';
 const currentYear = new Date().getFullYear();
 ---
 
@@ -20,10 +21,10 @@ const currentYear = new Date().getFullYear();
       <nav class="footer-nav" aria-label="Mapa del sitio">
         <p class="footer-nav-title">Accesos rápidos</p>
         <ul>
-          <li><a href="/semaforo">Consultar mi recomendación</a></li>
-          <li><a href="/cursos">Cursos de Derechos Humanos</a></li>
-          <li><a href="/nosotros">Quiénes somos</a></li>
-          <li><a href="/contacto">Contacto</a></li>
+          <li><a href={withBase('/semaforo')}>Consultar mi recomendación</a></li>
+          <li><a href={withBase('/cursos')}>Cursos de Derechos Humanos</a></li>
+          <li><a href={withBase('/nosotros')}>Quiénes somos</a></li>
+          <li><a href={withBase('/contacto')}>Contacto</a></li>
         </ul>
       </nav>
 
