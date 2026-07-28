@@ -21,8 +21,8 @@ const currentYear = new Date().getFullYear();
       <nav class="footer-nav" aria-label="Mapa del sitio">
         <p class="footer-nav-title">Accesos rápidos</p>
         <ul>
-          <li><a href={withBase('/semaforo')}>Consultar mi recomendación</a></li>
           <li><a href={withBase('/cursos')}>Cursos de Derechos Humanos</a></li>
+          <li><a href={withBase('/organigrama')}>Organigrama</a></li>
           <li><a href={withBase('/nosotros')}>Quiénes somos</a></li>
           <li><a href={withBase('/contacto')}>Contacto</a></li>
         </ul>
@@ -32,9 +32,10 @@ const currentYear = new Date().getFullYear();
       <nav class="footer-nav" aria-label="Marco legal">
         <p class="footer-nav-title">Marco normativo</p>
         <ul>
-          <li><a href="https://congresomich.gob.mx" target="_blank" rel="noopener">Legislación estatal</a></li>
-          <li><a href="https://www.cndh.org.mx" target="_blank" rel="noopener">CNDH</a></li>
-          <li><a href="#" >Aviso de privacidad</a></li>
+          <li><a href={withBase('/normativa')}>Documentos normativos</a></li>
+          <li><a href="https://congresomich.gob.mx" target="_blank" rel="noopener noreferrer">Legislación estatal</a></li>
+          <li><a href="https://www.cndh.org.mx" target="_blank" rel="noopener noreferrer">CNDH</a></li>
+          <li><a href={withBase('/privacidad')}>Aviso de privacidad</a></li>
           <li><a href="#" >Transparencia</a></li>
         </ul>
       </nav>

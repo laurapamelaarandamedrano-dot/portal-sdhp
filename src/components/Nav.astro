@@ -2,11 +2,12 @@
 import { withBase } from '../utils/url';
 
 const navLinks = [
-  { href: '/',           label: 'Inicio' },
-  { href: '/semaforo',   label: 'Mis Recomendaciones' },
-  { href: '/cursos',     label: 'Cursos DDHH' },
-  { href: '/nosotros',   label: 'Quiénes Somos' },
-  { href: '/contacto',   label: 'Contacto' },
+  { href: '/',             label: 'Inicio' },
+  { href: '/cursos',       label: 'Cursos DDHH' },
+  { href: '/organigrama',  label: 'Organigrama' },
+  { href: '/normativa',    label: 'Normativa' },
+  { href: '/nosotros',     label: 'Quiénes Somos' },
+  { href: '/contacto',     label: 'Contacto' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -48,9 +49,6 @@ const isActive = (href: string) => {
           {link.label}
         </a>
       ))}
-      <a href={withBase('/semaforo')} class="btn btn-primary nav-cta">
-        Consultar mi caso
-      </a>
     </nav>
 
     <!-- Botón menú móvil -->
@@ -77,11 +75,6 @@ const isActive = (href: string) => {
           {link.label}
         </a>
       ))}
-      <div class="mobile-cta">
-        <a href={withBase('/semaforo')} class="btn btn-primary" style="width:100%;justify-content:center;">
-          Consultar mi caso
-        </a>
-      </div>
     </nav>
   </div>
 </header>
@@ -197,19 +190,6 @@ const isActive = (href: string) => {
     background: rgba(255,195,208,0.12);
   }
 
-  .nav-cta {
-    margin-left: var(--space-2);
-    font-size: var(--text-sm);
-    padding: var(--space-2) var(--space-5);
-    background: var(--color-rosa);
-    color: var(--color-guinda);
-  }
-
-  .nav-cta:hover {
-    background: var(--color-blanco);
-    color: var(--color-guinda-dark);
-  }
-
   /* Toggle móvil */
   .nav-toggle {
     display: flex;
@@ -294,9 +274,5 @@ const isActive = (href: string) => {
 
   .mobile-link-active {
     color: var(--color-rosa);
-  }
-
-  .mobile-cta {
-    margin-top: var(--space-6);
   }
 </style>

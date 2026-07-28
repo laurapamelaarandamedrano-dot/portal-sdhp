@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/url';
 ---
 
 <BaseLayout
@@ -25,6 +26,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="form-area">
         <h2 class="form-title">Envíanos un mensaje</h2>
         <form class="contacto-form" id="contacto-form" novalidate>
+          <!-- Honeypot anti-bots: invisible para personas, atractivo para bots que autollenan formularios -->
+          <div class="form-honeypot" aria-hidden="true">
+            <label for="sitio-web">Sitio web (no llenar este campo)</label>
+            <input type="text" id="sitio-web" name="sitio_web" tabindex="-1" autocomplete="off" />
+          </div>
+
           <div class="form-group">
             <label for="nombre" class="form-label">Nombre completo <span aria-hidden="true">*</span></label>
             <input type="text" id="nombre" name="nombre" class="form-input" required placeholder="Tu nombre" autocomplete="name" />
@@ -63,7 +70,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class="form-privacy">
             <input type="checkbox" id="privacidad" name="privacidad" required />
             <label for="privacidad">
-              He leído y acepto el <a href="#">aviso de privacidad</a>. Entiendo que mis datos serán utilizados únicamente para atender mi solicitud.
+              He leído y acepto el <a href={withBase('/privacidad')} target="_blank" rel="noopener noreferrer">aviso de privacidad</a>. Entiendo que mis datos serán utilizados únicamente para atender mi solicitud.
             </label>
           </div>
 
@@ -72,6 +79,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </button>
 
           <div id="form-mensaje" hidden role="alert" class="form-success"></div>
+          <div id="form-error" hidden role="alert" class="form-error"></div>
         </form>
       </div>
 
@@ -131,10 +139,60 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  // Sanitiza texto antes de insertarlo como HTML (usa el propio navegador
+  // para escapar &, <, >, comillas, etc. — nunca se interpola texto de
+  // usuario directamente en innerHTML sin pasar por aquí).
+  function escapeHtml(texto: string): string {
+    const div = document.createElement('div');
+    div.textContent = texto;
+    return div.innerHTML;
+  }
+
+  // Rate limiting simulado en cliente: máx. 3 envíos por 10 minutos.
+  // Es una mitigación básica de abuso en un sitio sin backend — no
+  // sustituye un rate limit real del lado del servidor si en el futuro
+  // se conecta este formulario a un endpoint.
+  const RATE_LIMIT_KEY = 'sdhp_contacto_envios';
+  const RATE_LIMIT_MAX = 3;
+  const RATE_LIMIT_VENTANA_MS = 10 * 60 * 1000;
+
+  function obtenerEnviosRecientes(): number[] {
+    try {
+      const guardado = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || '[]');
+      const ahora = Date.now();
+      return Array.isArray(guardado) ? guardado.filter((t: number) => ahora - t < RATE_LIMIT_VENTANA_MS) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function registrarEnvio(envios: number[]) {
+    try {
+      envios.push(Date.now());
+      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(envios));
+    } catch {
+      // localStorage no disponible — el rate limit simplemente no persiste.
+    }
+  }
+
   document.getElementById('contacto-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const msgEl = document.getElementById('form-mensaje') as HTMLElement;
+    const errEl = document.getElementById('form-error') as HTMLElement;
+
+    errEl.setAttribute('hidden', '');
+    msgEl.setAttribute('hidden', '');
+
+    // Honeypot: si este campo invisible viene lleno, es un bot.
+    const honeypot = (form.querySelector('#sitio-web') as HTMLInputElement)?.value;
+    if (honeypot) {
+      // No se revela al bot que fue detectado: se simula éxito sin enviar nada.
+      form.reset();
+      msgEl.removeAttribute('hidden');
+      msgEl.textContent = '✅ Tu mensaje fue enviado correctamente. Te contactaremos en máximo 24 horas hábiles.';
+      return;
+    }
 
     // Validación simple
     if (!form.checkValidity()) {
@@ -142,17 +200,30 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       return;
     }
 
+    // Rate limiting
+    const envios = obtenerEnviosRecientes();
+    if (envios.length >= RATE_LIMIT_MAX) {
+      errEl.removeAttribute('hidden');
+      errEl.textContent = '⚠️ Alcanzaste el límite de 3 envíos en 10 minutos. Intenta de nuevo más tarde o escríbenos directamente a ddhh@michoacan.gob.mx.';
+      errEl.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    const nombre = (form.querySelector('#nombre') as HTMLInputElement)?.value.trim() || '';
+
     // Simular envío (en producción: fetch a un endpoint)
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
     btn.disabled = true;
     btn.textContent = 'Enviando...';
 
     setTimeout(() => {
+      registrarEnvio(envios);
       form.reset();
       btn.disabled = false;
       btn.textContent = 'Enviar mensaje';
       msgEl.removeAttribute('hidden');
-      msgEl.textContent = '✅ Tu mensaje fue enviado correctamente. Te contactaremos en máximo 24 horas hábiles.';
+      // El nombre se sanitiza (escape de HTML) antes de mostrarse en pantalla.
+      msgEl.innerHTML = `✅ Gracias, <strong>${escapeHtml(nombre)}</strong>. Tu mensaje fue enviado correctamente. Te contactaremos en máximo 24 horas hábiles.`;
       msgEl.scrollIntoView({ behavior: 'smooth' });
     }, 1200);
   });
@@ -215,6 +286,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     gap: var(--space-2);
   }
 
+  /* Honeypot anti-bots: oculto visualmente, presente en el DOM para que
+     los bots que autollenan campos lo detecten y lo llenen. */
+  .form-honeypot {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
   .form-label {
     font-family: var(--font-display);
     font-weight: 700;
@@ -267,6 +349,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     padding: var(--space-4) var(--space-5);
     font-family: var(--font-display);
     font-weight: 600;
+  }
+
+  .form-error {
+    background: #FEE2E2;
+    color: var(--semaforo-rojo);
+    border: 1px solid #FCA5A5;
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.5;
   }
 
   /* Info cards */

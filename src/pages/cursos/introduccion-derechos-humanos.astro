@@ -2,6 +2,128 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase } from '../../utils/url';
 
+// ── Identidad del curso para localStorage (ver src/utils/cursoStorage.js) ──
+const CURSO_ID = 'intro';
+
+// El nombre mostrado en la constancia es distinto al título de la página/curso.
+const NOMBRE_CONSTANCIA = 'Curso Básico de Derechos Humanos';
+
+type BloqueContenido =
+  | { tipo: 'parrafo'; texto: string }
+  | { tipo: 'subtitulo'; texto: string }
+  | { tipo: 'cita'; texto: string; autor: string }
+  | { tipo: 'reflexion'; texto: string }
+  | { tipo: 'destacado'; titulo: string; texto: string }
+  | { tipo: 'lista'; items: string[] }
+  | { tipo: 'lista-numerada'; items: string[] }
+  | { tipo: 'timeline'; eventos: { anio: string; texto: string }[] }
+  | { tipo: 'comparativa'; columnas: string[]; filas: { nombre: string; valores: string[] }[] }
+  | { tipo: 'generaciones'; items: { numero: number; titulo: string; epoca: string; descripcion: string; ejemplos: string[] }[] }
+  | { tipo: 'piramide'; niveles: { nivel: string; descripcion: string }[] }
+  | { tipo: 'contactos'; items: { nombre: string; telefono: string }[] };
+
+function escapeHtml(texto: string): string {
+  return texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Convierte **negritas** estilo markdown a <strong>, escapando el resto.
+function inline(texto: string): string {
+  return escapeHtml(texto).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+function renderBloque(b: BloqueContenido): string {
+  switch (b.tipo) {
+    case 'parrafo':
+      return `<p>${inline(b.texto)}</p>`;
+
+    case 'subtitulo':
+      return `<h3 class="modulo-subtitulo">${inline(b.texto)}</h3>`;
+
+    case 'cita':
+      return `<blockquote class="modulo-cita"><p>“${inline(b.texto)}”</p><cite>— ${inline(b.autor)}</cite></blockquote>`;
+
+    case 'reflexion':
+      return `<p class="modulo-reflexion">${inline(b.texto)}</p>`;
+
+    case 'destacado':
+      return `<div class="modulo-destacado"><strong class="modulo-destacado-titulo">${inline(b.titulo)}</strong><p>${inline(b.texto)}</p></div>`;
+
+    case 'lista':
+      return `<ul class="modulo-lista">${b.items.map(i => `<li>${inline(i)}</li>`).join('')}</ul>`;
+
+    case 'lista-numerada':
+      return `<ol class="modulo-lista-numerada">${b.items.map(i => `<li>${inline(i)}</li>`).join('')}</ol>`;
+
+    case 'timeline':
+      return `<ol class="modulo-timeline">${b.eventos.map(e => `
+        <li class="timeline-item">
+          <span class="timeline-anio">${inline(e.anio)}</span>
+          <span class="timeline-texto">${inline(e.texto)}</span>
+        </li>`).join('')}</ol>`;
+
+    // TODO: los valores de esta tabla comparativa (Derechos Humanos / Derechos
+    // Fundamentales / Garantías) son una redacción pedagógica propia a partir
+    // de los encabezados solicitados; verificar contra el material oficial del
+    // curso antes de publicar como versión definitiva.
+    case 'comparativa':
+      return `<div class="modulo-comparativa">${b.filas.map(fila => `
+        <div class="comparativa-card">
+          <h4 class="comparativa-nombre">${inline(fila.nombre)}</h4>
+          <dl class="comparativa-lista">
+            ${b.columnas.map((col, i) => `
+              <div class="comparativa-item">
+                <dt>${inline(col)}</dt>
+                <dd>${inline(fila.valores[i] ?? '')}</dd>
+              </div>
+            `).join('')}
+          </dl>
+        </div>
+      `).join('')}</div>`;
+
+    case 'generaciones':
+      return `<div class="modulo-generaciones">${b.items.map(g => `
+        <div class="generacion-card generacion-${g.numero}">
+          <span class="generacion-numero">${g.numero}ª</span>
+          <h4 class="generacion-titulo">${inline(g.titulo)}</h4>
+          <span class="generacion-epoca">${inline(g.epoca)}</span>
+          <p class="generacion-desc">${inline(g.descripcion)}</p>
+          <ul class="generacion-ejemplos">${g.ejemplos.map(e => `<li>${inline(e)}</li>`).join('')}</ul>
+        </div>
+      `).join('')}</div>`;
+
+    case 'piramide': {
+      const colores = ['var(--color-guinda)', 'var(--color-morado)', 'var(--color-salvia)', '#8B6F5E', '#9CA89F'];
+      return `<div class="modulo-piramide">${b.niveles.map((n, i) => `
+        <div class="piramide-nivel" style="background:${colores[i] ?? 'var(--color-salvia)'};width:${Math.max(40, 100 - i * 15)}%">
+          <span class="piramide-etiqueta">${inline(n.nivel)}</span>
+          <p class="piramide-desc">${inline(n.descripcion)}</p>
+        </div>
+      `).join('')}</div>`;
+    }
+
+    case 'contactos':
+      return `<div class="modulo-contactos">${b.items.map(c => `
+        <a class="contacto-chip" href="tel:${c.telefono.replace(/\s+/g, '')}">
+          <span class="contacto-chip-nombre">${inline(c.nombre)}</span>
+          <span class="contacto-chip-tel">${inline(c.telefono)}</span>
+        </a>
+      `).join('')}</div>`;
+
+    default:
+      return '';
+  }
+}
+
+interface Modulo {
+  id: number;
+  titulo: string;
+  contenido: BloqueContenido[];
+  quiz: { pregunta: string; opciones: string[]; correcta: number };
+}
+
+// TODO: verificar la jerarquía, fechas y redacción exactas de este contenido
+// contra el material curricular oficial vigente de la Subsecretaría antes de
+// considerarlo la versión definitiva del curso.
 const curso = {
   titulo: 'Introducción a los Derechos Humanos',
   emoji: '⚖️',
@@ -10,134 +132,238 @@ const curso = {
     {
       id: 1,
       titulo: '¿Qué son los Derechos Humanos?',
-      contenido: `Los derechos humanos son prerrogativas inherentes a todos los seres humanos, sin distinción de raza, sexo, nacionalidad, etnia, idioma, religión o cualquier otra condición. Son universales, interdependientes e inalienables.
-
-**Características fundamentales:**
-- **Universales:** Pertenecen a todas las personas por igual.
-- **Inalienables:** No pueden ser transferidos ni renunciados voluntariamente.
-- **Indivisibles:** Todos tienen igual importancia; no se pueden sacrificar unos por otros.
-- **Interdependientes:** El pleno disfrute de un derecho depende de los demás.
-
-Nacemos con derechos, no los ganamos ni los merecemos: simplemente los tenemos por el hecho de ser personas.`,
+      contenido: [
+        { tipo: 'cita', texto: 'Nuestras vidas empiezan a terminar el día que nos quedamos callados ante las cosas que nos importan.', autor: 'Martin Luther King Jr.' },
+        { tipo: 'parrafo', texto: 'Los derechos humanos son las libertades esenciales que toda persona tiene desde que nace, solo por el hecho de ser humana. Son anteriores a cualquier ley y el gobierno tiene la obligación estricta de protegerlos.' },
+        { tipo: 'destacado', titulo: 'Definición operativa', texto: 'Los derechos humanos son las garantías esenciales que toda persona necesita para vivir con dignidad y desarrollarse plenamente, las cuales están protegidas por la Constitución y las leyes.' },
+        { tipo: 'subtitulo', texto: 'Derechos Humanos, Derechos Fundamentales y Garantías' },
+        {
+          tipo: 'comparativa',
+          columnas: ['Origen', 'Reconocimiento', 'Alcance', 'Relación', 'Ejemplos'],
+          filas: [
+            { nombre: 'Derechos Humanos', valores: ['Dignidad humana, previos al Estado', 'Tratados internacionales', 'Universal (toda persona)', 'Fundamento ético y filosófico', 'Vida, libertad, igualdad'] },
+            { nombre: 'Derechos Fundamentales', valores: ['Reconocidos por el propio Estado', 'Constitución', 'Nacional (dentro del país)', 'Positivización de los derechos humanos', 'Derechos constitucionales'] },
+            { nombre: 'Garantías', valores: ['Mecanismos que crea el Estado', 'Leyes secundarias', 'Nacional, por vía procesal', 'Instrumento para exigir DH y DF', 'Amparo, queja ante la CEDH'] },
+          ],
+        },
+        { tipo: 'subtitulo', texto: 'Características de los Derechos Humanos' },
+        { tipo: 'lista', items: [
+          '**Universales:** aplican a todas las personas sin distinción.',
+          '**Inalienables:** no pueden transferirse ni renunciarse.',
+          '**Imprescriptibles:** no caducan con el paso del tiempo.',
+          '**Exigibles:** pueden reclamarse ante instancias competentes.',
+          '**Indivisibles e interdependientes:** ningún derecho vale más que otro y todos se relacionan entre sí.',
+          '**Dignidad humana:** es el fundamento último de todos ellos.',
+        ]},
+        { tipo: 'subtitulo', texto: 'Principios' },
+        { tipo: 'lista', items: [
+          '**Interdependencia:** el disfrute de un derecho depende de los demás.',
+          '**Igualdad y no discriminación:** los derechos aplican a todas las personas por igual.',
+          '**Universalidad:** corresponden a todo ser humano, en cualquier lugar.',
+          '**Progresividad:** el Estado debe ampliar su protección y nunca retroceder.',
+        ]},
+      ],
       quiz: {
-        pregunta: '¿Cuál de las siguientes es una característica de los derechos humanos?',
-        opciones: ['Solo aplican a ciudadanos con documentos', 'Son universales e inalienables', 'Los otorga el gobierno', 'Solo protegen a grupos vulnerables'],
+        pregunta: '¿Cuál es la definición operativa de los derechos humanos según el curso?',
+        opciones: ['Leyes que el gobierno otorga a sus ciudadanos', 'Garantías esenciales para vivir con dignidad, protegidas por la Constitución', 'Privilegios que se ganan con el tiempo', 'Derechos que solo aplican en situaciones de crisis'],
         correcta: 1,
-      }
+      },
     },
     {
       id: 2,
-      titulo: 'Historia y evolución',
-      contenido: `La idea de que existen derechos propios de toda persona ha existido en muchas culturas, pero fue en el siglo XX cuando se codificaron universalmente.
-
-**Hitos históricos:**
-- **1945:** Creación de la ONU tras la Segunda Guerra Mundial.
-- **1948:** Declaración Universal de Derechos Humanos — el primer reconocimiento global.
-- **1966:** Pactos Internacionales de Derechos Civiles y Políticos, y de Derechos Económicos, Sociales y Culturales.
-- **1990s:** Tratados especializados: derechos de la mujer, la infancia, personas con discapacidad.
-
-En México, los derechos humanos están reconocidos en el artículo 1° de la Constitución Política, reformado en 2011 para incorporar los tratados internacionales.`,
+      titulo: 'Historia y Orígenes',
+      contenido: [
+        { tipo: 'parrafo', texto: 'Los primeros antecedentes de los derechos humanos se remontan a documentos como el Cilindro de Ciro y la Carta Magna.' },
+        { tipo: 'lista', items: [
+          '**Cilindro de Ciro (539 a. C.):** creado por Ciro el Grande, rey de Persia; proclamó la liberación de esclavos y el derecho a elegir la religión propia.',
+          '**Carta Magna (1215):** limitó el poder del rey, garantizó derechos a los nobles y sentó un precedente para los derechos individuales.',
+          '**Petición de Derechos (1628):** frenó el poder absoluto del rey en Inglaterra.',
+          '**Declaración de Independencia de EUA (1776):** proclamó derechos inalienables: vida, libertad y búsqueda de la felicidad.',
+          '**Declaración de los Derechos del Hombre y del Ciudadano (1789):** producto de la Revolución Francesa; estableció la igualdad ante la ley.',
+        ]},
+        { tipo: 'subtitulo', texto: 'Línea del tiempo' },
+        { tipo: 'timeline', eventos: [
+          { anio: '1215', texto: 'Carta Magna' },
+          { anio: '1628', texto: 'Petición de Derechos' },
+          { anio: '1679', texto: 'Habeas Corpus' },
+          { anio: '1689', texto: 'Declaración de Derechos (Inglaterra)' },
+          { anio: '1776', texto: 'Declaración de Independencia de EUA' },
+          { anio: '1789', texto: 'Declaración de los Derechos del Hombre y del Ciudadano (Francia)' },
+          { anio: '1813', texto: 'Sentimientos de la Nación (México)' },
+          { anio: '1945', texto: 'Carta de la ONU' },
+          { anio: '1948', texto: 'Declaración Universal de los Derechos Humanos' },
+        ]},
+        { tipo: 'subtitulo', texto: 'Constituciones mexicanas' },
+        { tipo: 'timeline', eventos: [
+          { anio: '1812', texto: 'Constitución de Cádiz' },
+          { anio: '1814', texto: 'Constitución de Apatzingán' },
+          { anio: '1824', texto: 'Constitución de 1824' },
+          { anio: '1836', texto: 'Siete Leyes' },
+          { anio: '1847', texto: 'Acta de Reformas' },
+          { anio: '1857', texto: 'Constitución de 1857' },
+          { anio: '1917', texto: 'Constitución de 1917 — primera en el mundo en reconocer derechos sociales: trabajo y educación' },
+        ]},
+        { tipo: 'subtitulo', texto: 'Primeras instituciones en México' },
+        { tipo: 'lista', items: [
+          '**1975:** Procuraduría Federal del Consumidor (PROFECO).',
+          '**1979:** Dirección de Derechos Humanos de Nuevo León.',
+          '**1985:** Defensoría de los Derechos Universitarios (UNAM).',
+          '**1990:** Comisión Nacional de Derechos Humanos (CNDH).',
+          '**1992:** la CNDH adquiere rango constitucional.',
+        ]},
+        { tipo: 'destacado', titulo: 'Para recordar', texto: 'Los derechos humanos no aparecieron de súbito: son producto de las exigencias sociales a lo largo de la historia.' },
+      ],
       quiz: {
-        pregunta: '¿En qué año se adoptó la Declaración Universal de Derechos Humanos?',
-        opciones: ['1945', '1948', '1966', '2011'],
+        pregunta: '¿Qué hace especial a la Constitución mexicana de 1917?',
+        opciones: ['Fue la primera constitución del mundo', 'Fue la primera en reconocer derechos sociales como trabajo y educación', 'Creó la CNDH', 'Adoptó la Declaración Universal de Derechos Humanos'],
         correcta: 1,
-      }
+      },
     },
     {
       id: 3,
-      titulo: 'Sistemas de protección',
-      contenido: `Existen mecanismos en tres niveles para proteger tus derechos:
-
-**1. Nacional (México)**
-- **CNDH** — Comisión Nacional de Derechos Humanos: atiende violaciones por autoridades federales.
-- **CEDH** — Comisión Estatal de Derechos Humanos (en Michoacán): atiende violaciones por autoridades estatales y municipales.
-- **Poder Judicial:** amparo, acciones colectivas.
-
-**2. Regional (Américas)**
-- **CIDH** — Comisión Interamericana de Derechos Humanos.
-- **Corte IDH** — Corte Interamericana de Derechos Humanos.
-
-**3. Universal (ONU)**
-- **Consejo de Derechos Humanos.**
-- Comités de tratados específicos.
-
-Primero debes agotar recursos nacionales antes de acudir a instancias internacionales.`,
+      titulo: 'Generaciones de los Derechos Humanos',
+      contenido: [
+        { tipo: 'parrafo', texto: 'La clasificación de los derechos humanos por generaciones fue propuesta por **Karel Vasak**, jurista checo-francés, en 1979.' },
+        { tipo: 'parrafo', texto: 'Aunque ha sido criticada por sugerir una jerarquía entre derechos —que en realidad son indivisibles e interdependientes—, esta clasificación resulta útil con fines didácticos.' },
+        {
+          tipo: 'generaciones',
+          items: [
+            { numero: 1, titulo: 'Derechos civiles y políticos', epoca: 'Siglos XVIII–XIX', descripcion: 'Libertades individuales frente al Estado.', ejemplos: ['Vida', 'Libertad', 'Expresión', 'Voto', 'Debido proceso'] },
+            { numero: 2, titulo: 'Derechos económicos, sociales y culturales', epoca: 'Siglo XX, posterior a 1948', descripcion: 'Condiciones materiales para una vida digna.', ejemplos: ['Salud', 'Educación', 'Trabajo', 'Vivienda', 'Seguridad social'] },
+            { numero: 3, titulo: 'Derechos de solidaridad o colectivos', epoca: 'Décadas de 1970 a 1990', descripcion: 'Intereses de pueblos y comunidades.', ejemplos: ['Paz', 'Medio ambiente sano', 'Desarrollo', 'Patrimonio común'] },
+            { numero: 4, titulo: 'Derechos digitales y emergentes', epoca: 'Siglo XXI', descripcion: 'Entornos tecnológicos y bioética.', ejemplos: ['Privacidad digital', 'Acceso a internet', 'Protección de datos'] },
+          ],
+        },
+      ],
       quiz: {
-        pregunta: '¿Qué organismo atiende violaciones a derechos humanos por autoridades estatales en Michoacán?',
-        opciones: ['CNDH', 'Corte IDH', 'CEDH', 'CIDH'],
-        correcta: 2,
-      }
+        pregunta: '¿Quién propuso la clasificación de derechos humanos por generaciones?',
+        opciones: ['Eleanor Roosevelt', 'Karel Vasak en 1979', 'La ONU en 1948', 'La Corte Interamericana en 1969'],
+        correcta: 1,
+      },
     },
     {
       id: 4,
-      titulo: 'Derechos civiles y políticos',
-      contenido: `Los derechos civiles y políticos protegen las libertades individuales frente al Estado.
-
-**Principales derechos:**
-- Derecho a la vida e integridad personal.
-- Libertad y seguridad personales (nadie puede ser detenido arbitrariamente).
-- Prohibición de la tortura y tratos crueles.
-- Derecho a un juicio justo.
-- Libertad de expresión, pensamiento y religión.
-- Derecho a votar y participar en asuntos públicos.
-- Privacidad y protección de datos personales.
-
-**¿Cómo te protegen en el día a día?**
-Si eres detenido, tienes derecho a saber los motivos, a un abogado y a guardar silencio. Si el Estado viola tu privacidad sin orden judicial, puede ser denunciado ante la CEDH.`,
+      titulo: 'Marco Normativo',
+      contenido: [
+        { tipo: 'subtitulo', texto: 'Jerarquía normativa' },
+        {
+          tipo: 'piramide',
+          niveles: [
+            { nivel: 'Bloque de Constitucionalidad', descripcion: 'Art. 1° de la CPEUM + Tratados Internacionales de Derechos Humanos.' },
+            { nivel: 'Leyes Federales', descripcion: 'Ley General de Víctimas, LGAMVLV, Ley General de Salud, entre otras.' },
+            { nivel: 'Leyes Estatales', descripcion: 'Ley de Derechos Humanos de Michoacán y demás legislación local.' },
+            { nivel: 'Reglamentos', descripcion: 'Normas que detallan cómo se aplican las leyes.' },
+            { nivel: 'Actos de Autoridad', descripcion: 'Aquí es donde con mayor frecuencia ocurren las violaciones a derechos.' },
+          ],
+        },
+        { tipo: 'destacado', titulo: 'Principio pro persona', texto: 'Cuando dos normas protegen el mismo derecho, siempre se aplica la que más te beneficie.' },
+        { tipo: 'subtitulo', texto: 'Sistema Universal (ONU)' },
+        { tipo: 'lista', items: [
+          'Declaración Universal de los Derechos Humanos (1948)',
+          'Pacto Internacional de Derechos Civiles y Políticos (1966)',
+          'Pacto Internacional de Derechos Económicos, Sociales y Culturales (1966)',
+          'Convención contra la Tortura (1984)',
+          'Convención sobre los Derechos del Niño (1989)',
+          'CEDAW — Convención sobre la Eliminación de la Discriminación contra la Mujer (1979)',
+          'Convención sobre los Derechos de las Personas con Discapacidad (2006)',
+          'Convenio 169 de la OIT sobre Pueblos Indígenas y Tribales (1989)',
+        ]},
+        { tipo: 'subtitulo', texto: 'Sistema Interamericano (OEA)' },
+        { tipo: 'lista', items: [
+          'Convención Americana sobre Derechos Humanos (1969)',
+          'Protocolo de San Salvador (1988)',
+          'Convención de Belém do Pará (1994)',
+          'Convención Interamericana para Prevenir y Sancionar la Tortura (1985)',
+          'Convención Interamericana sobre Desaparición Forzada de Personas (1994)',
+        ]},
+        { tipo: 'subtitulo', texto: 'Leyes federales relevantes' },
+        { tipo: 'lista', items: [
+          'Ley General de Víctimas (2013)',
+          'Ley General de Acceso de las Mujeres a una Vida Libre de Violencia — LGAMVLV (2007)',
+          'Ley Federal para Prevenir y Eliminar la Discriminación (2003)',
+          'Ley General de los Derechos de Niñas, Niños y Adolescentes (2014)',
+          'Ley General para la Inclusión de las Personas con Discapacidad (2011)',
+          'Ley General en Materia de Desaparición Forzada (2017)',
+          'Ley General de Salud',
+          'Ley de Amparo (2013)',
+        ]},
+        { tipo: 'subtitulo', texto: 'Marco estatal — Michoacán' },
+        { tipo: 'lista', items: [
+          'Constitución Política del Estado de Michoacán',
+          'Ley de Derechos Humanos del Estado de Michoacán (regula a la CEDH)',
+          'Ley de Acceso de las Mujeres a una Vida Libre de Violencia del Estado',
+          'Ley para la Inclusión de las Personas con Discapacidad del Estado',
+          'Reglamento Interior de la Secretaría de Gobierno',
+        ]},
+      ],
       quiz: {
-        pregunta: '¿Cuál de los siguientes es un derecho civil y político?',
-        opciones: ['Derecho a la educación gratuita', 'Derecho al trabajo', 'Libertad de expresión', 'Acceso a servicios de salud'],
+        pregunta: '¿Qué establece el principio pro persona?',
+        opciones: ['Que la Constitución siempre está por encima de los tratados internacionales', 'Que los jueces tienen preferencia sobre el legislador', 'Que siempre se aplica la norma que más beneficie a la persona', 'Que los derechos solo aplican a ciudadanos'],
         correcta: 2,
-      }
+      },
     },
     {
       id: 5,
-      titulo: 'Derechos económicos, sociales y culturales',
-      contenido: `Los DESC garantizan condiciones de vida digna.
-
-**Principales derechos:**
-- **Educación:** gratuita y obligatoria en nivel básico.
-- **Salud:** acceso a servicios de salud de calidad.
-- **Trabajo:** condiciones justas, salario digno, seguridad social.
-- **Vivienda:** acceso a una vivienda adecuada.
-- **Alimentación:** acceso a alimentos suficientes y nutritivos.
-- **Cultura:** participar en la vida cultural, acceder al conocimiento.
-
-**Característica clave:** Se implementan progresivamente. El Estado debe hacer el máximo esfuerzo posible con los recursos disponibles y nunca retroceder en lo ya alcanzado.
-
-En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos derechos.`,
+      titulo: 'La Subsecretaría y sus Obligaciones',
+      contenido: [
+        { tipo: 'subtitulo', texto: 'Evolución en Michoacán' },
+        { tipo: 'timeline', eventos: [
+          { anio: '1993', texto: 'Se crea la CEDH Michoacán (8 de febrero). Primer presidente: José Rigoberto Díaz Zavala (1993–1996).' },
+          { anio: '2011', texto: 'Reforma constitucional en derechos humanos: amplía el mandato de las comisiones.' },
+          { anio: '2000s', texto: 'Se crea la Subsecretaría de Derechos Humanos y Población.' },
+          { anio: '2022', texto: 'Creación formal mediante el Reglamento Interior de la Secretaría de Gobierno (15 de febrero).' },
+        ]},
+        { tipo: 'parrafo', texto: 'La reforma constitucional de 2011 fue el catalizador que justificó consolidar la Subsecretaría dentro de la estructura de la Secretaría de Gobierno.' },
+        { tipo: 'destacado', titulo: 'Estructura', texto: 'Regulada en los artículos 15, 31, 32 y 33 del Reglamento Interior: integra la Dirección de Derechos Humanos y el Consejo Estatal de Población (COESPO).' },
+        { tipo: 'subtitulo', texto: 'Las 4 obligaciones del Estado' },
+        { tipo: 'lista', items: [
+          '**Respetar:** no interferir; la autoridad no puede violar derechos directamente.',
+          '**Proteger:** evitar que terceros —personas o empresas— violen los derechos.',
+          '**Garantizar:** crear las condiciones para que puedas ejercer tus derechos.',
+          '**Promover:** difundir, educar y sensibilizar.',
+        ]},
+        { tipo: 'subtitulo', texto: 'Grupos en situación de vulnerabilidad' },
+        { tipo: 'lista', items: ['Mujeres', 'Niñas, niños y adolescentes', 'Personas indígenas', 'Personas migrantes', 'Personas LGBTIQ+', 'Personas con discapacidad'] },
+        { tipo: 'destacado', titulo: 'Interseccionalidad', texto: 'Una mujer indígena migrante no enfrenta tres discriminaciones por separado: las enfrenta todas a la vez, y se amplifican entre sí.' },
+        { tipo: 'subtitulo', texto: 'Contexto en Michoacán' },
+        { tipo: 'lista', items: ['Desplazamiento forzado interno', 'Madres buscadoras', 'Comunidades indígenas y acceso a servicios', 'Violencia de género institucional'] },
+      ],
       quiz: {
-        pregunta: '¿Cómo se implementan los Derechos Económicos, Sociales y Culturales?',
-        opciones: ['De forma inmediata y absoluta', 'No son exigibles legalmente', 'Progresivamente, con el máximo de recursos disponibles', 'Solo en países desarrollados'],
+        pregunta: '¿Cuándo se creó formalmente la Subsecretaría de Derechos Humanos y Población?',
+        opciones: ['8 de febrero de 1993', 'Con la reforma constitucional de 2011', 'El 15 de febrero de 2022', 'En la década de los 90'],
         correcta: 2,
-      }
+      },
     },
     {
       id: 6,
-      titulo: 'Tus derechos hoy: cómo actuar',
-      contenido: `Conocer tus derechos te da poder para exigirlos.
-
-**Si sientes que un derecho fue violado:**
-1. **Identifica** qué derecho se vulneró y qué autoridad fue responsable.
-2. **Reúne evidencia:** documentos, testigos, fotografías, fechas.
-3. **Presenta una queja** ante la CEDH (si fue autoridad estatal/municipal) o CNDH (si fue federal).
-4. **Da seguimiento** en línea o acudiendo personalmente.
-
-**Datos de la CEDH Michoacán:**
-- Morelia, Michoacán
-- Atención ciudadana: lunes a viernes
-- El proceso es gratuito y confidencial
-
-**Recuerda:** Las comisiones no te cobran nada. Tienes derecho a acceder a ellas sin importar tu condición económica, educación o situación migratoria.
-
-¡Felicidades! Completaste el curso. Ahora puedes obtener tu constancia.`,
+      titulo: '¿A quién acudo? Tú ya eres parte del cambio',
+      contenido: [
+        { tipo: 'parrafo', texto: 'Estas rutas no se excluyen entre sí: puedes usarlas al mismo tiempo, según tu caso.' },
+        { tipo: 'lista', items: [
+          '**CEDH:** violación por autoridad estatal o municipal.',
+          '**CNDH:** violación por autoridad federal (IMSS, ISSSTE, Ejército).',
+          '**Juicio de Amparo:** violación constitucional, detención ilegal.',
+          '**Organismos especializados:** CONAPRED, INPI, INMUJERES, DIF.',
+          '**CIDH / Sistema Interamericano:** cuando ya agotaste las instancias internas y hay un daño grave.',
+          '**Vía penal / Fiscalía:** tortura, desaparición, delito cometido por una autoridad.',
+        ]},
+        { tipo: 'subtitulo', texto: 'Contactos clave' },
+        { tipo: 'contactos', items: [
+          { nombre: 'CEDH Michoacán', telefono: '800 832 2334' },
+          { nombre: 'CNDH', telefono: '800 715 2000' },
+          { nombre: 'Línea de la Mujer', telefono: '800 911 2000' },
+          { nombre: 'CONAPRED', telefono: '800 543 0033' },
+        ]},
+        { tipo: 'reflexion', texto: 'No son un regalo. Son una conquista.' },
+        { tipo: 'subtitulo', texto: 'Tú ya eres parte del cambio.' },
+      ],
       quiz: {
-        pregunta: '¿Cuánto cuesta presentar una queja ante la CEDH?',
-        opciones: ['Depende del caso', '$500 MXN', 'Es completamente gratuito', 'Solo si tienes abogado'],
+        pregunta: 'Si una autoridad municipal viola tus derechos, ¿a qué organismo acudes primero?',
+        opciones: ['CNDH', 'Sistema Interamericano (CIDH)', 'CEDH Michoacán', 'Fiscalía General del Estado'],
         correcta: 2,
-      }
+      },
     },
-  ]
+  ] as Modulo[],
 };
 ---
 
@@ -174,33 +400,49 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
       <!-- Sidebar: índice de módulos -->
       <aside class="modulos-sidebar" aria-label="Índice del curso">
         <div class="sidebar-inner">
-          <h2 class="sidebar-title">Módulos</h2>
-          <ol class="modulos-index" id="modulos-index">
-            {curso.modulos.map(m => (
-              <li>
-                <button
-                  class="modulo-index-btn"
-                  data-modulo={m.id}
-                  onclick={`irModulo(${m.id})`}
-                  aria-label={`Módulo ${m.id}: ${m.titulo}`}
-                >
-                  <span class="modulo-num">{m.id}</span>
-                  <span class="modulo-index-titulo">{m.titulo}</span>
-                  <span class="modulo-check" id={`check-${m.id}`} hidden aria-hidden="true">✓</span>
-                </button>
-              </li>
-            ))}
-          </ol>
+          <button
+            type="button"
+            class="sidebar-toggle"
+            id="sidebar-toggle"
+            aria-expanded="false"
+            aria-controls="sidebar-collapsible"
+          >
+            <span class="sidebar-title">Módulos</span>
+            <span class="sidebar-toggle-icon" aria-hidden="true">▾</span>
+          </button>
 
-          <!-- Progreso -->
-          <div class="sidebar-progreso">
-            <div class="progreso-label">
-              <span>Progreso</span>
-              <span id="progreso-pct">0%</span>
+          <div class="sidebar-collapsible" id="sidebar-collapsible">
+            <ol class="modulos-index" id="modulos-index">
+              {curso.modulos.map(m => (
+                <li>
+                  <button
+                    class="modulo-index-btn js-ir-modulo"
+                    data-modulo={m.id}
+                    data-target={m.id}
+                    aria-label={`Módulo ${m.id}: ${m.titulo}`}
+                  >
+                    <span class="modulo-num">{m.id}</span>
+                    <span class="modulo-index-titulo">{m.titulo}</span>
+                    <span class="modulo-check" id={`check-${m.id}`} hidden aria-hidden="true">✓</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+
+            <!-- Progreso -->
+            <div class="sidebar-progreso">
+              <div class="progreso-label">
+                <span>Progreso</span>
+                <span id="progreso-pct">0%</span>
+              </div>
+              <div class="progreso-bar-wrap" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} id="progreso-bar-wrap">
+                <div class="progreso-bar" id="progreso-bar" style="width:0%"></div>
+              </div>
             </div>
-            <div class="progreso-bar-wrap" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0} id="progreso-bar-wrap">
-              <div class="progreso-bar" id="progreso-bar" style="width:0%"></div>
-            </div>
+
+            <button type="button" class="btn-reiniciar" id="btn-reiniciar-curso">
+              ↺ Reiniciar curso
+            </button>
           </div>
         </div>
       </aside>
@@ -219,13 +461,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
               <h2 class="modulo-titulo">{modulo.titulo}</h2>
             </div>
 
-            <div class="modulo-contenido" set:html={modulo.contenido
-              .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-              .replace(/^- (.+)$/gm, '<li>$1</li>')
-              .replace(/(<li>[\s\S]+?<\/li>)/g, '<ul>$1</ul>')
-              .replace(/<\/ul>\s*<ul>/g, '')
-              .split('\n\n').map((p: string) => p.startsWith('<') ? p : `<p>${p}</p>`).join('')
-            } />
+            <div class="modulo-contenido" set:html={modulo.contenido.map(renderBloque).join('')} />
 
             <!-- Quiz -->
             <div class="quiz-area" id={`quiz-${modulo.id}`}>
@@ -240,9 +476,8 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
                     data-modulo={modulo.id}
                     data-opcion={i}
                     data-correcta={modulo.quiz.correcta}
-                    onclick="responderQuiz(this)"
                   >
-                    <span class="quiz-opcion-letra" aria-hidden="true">{String.fromCharCode(65+i)}</span>
+                    <span class="quiz-opcion-letra" aria-hidden="true">{String.fromCharCode(65 + i)}</span>
                     {op}
                   </button>
                 ))}
@@ -253,15 +488,15 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
             <!-- Navegación módulo -->
             <div class="modulo-nav">
               {idx > 0 && (
-                <button class="btn btn-secondary" onclick={`irModulo(${modulo.id - 1})`}>
+                <button class="btn btn-secondary js-ir-modulo" data-target={modulo.id - 1}>
                   ← Módulo anterior
                 </button>
               )}
               {idx < curso.modulos.length - 1 ? (
                 <button
-                  class="btn btn-primary modulo-siguiente"
+                  class="btn btn-primary modulo-siguiente js-ir-modulo"
                   id={`siguiente-${modulo.id}`}
-                  onclick={`irModulo(${modulo.id + 1})`}
+                  data-target={modulo.id + 1}
                   disabled
                   aria-label={`Ir al módulo ${modulo.id + 1}`}
                 >
@@ -269,9 +504,8 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
                 </button>
               ) : (
                 <button
-                  class="btn btn-primary modulo-siguiente"
+                  class="btn btn-primary modulo-siguiente js-generar-constancia"
                   id={`siguiente-${modulo.id}`}
-                  onclick="generarConstancia()"
                   disabled
                 >
                   🎉 Obtener constancia
@@ -286,35 +520,13 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
           <div class="constancia-hero">
             <div class="constancia-icon" aria-hidden="true">🏆</div>
             <h2>¡Felicidades, lo lograste!</h2>
-            <p>Completaste el curso <strong>{curso.titulo}</strong>.</p>
-            <p>Tu constancia está lista para descargar.</p>
+            <p>Completaste el curso <strong>{NOMBRE_CONSTANCIA}</strong>.</p>
+            <p>Escribe tu nombre abajo y descarga tu constancia.</p>
             <div class="constancia-actions">
-              <button class="btn btn-primary" onclick="descargarConstancia()">
+              <button class="btn btn-primary js-imprimir-constancia">
                 📄 Descargar constancia PDF
               </button>
               <a href={withBase('/cursos')} class="btn btn-secondary">Ver más cursos</a>
-            </div>
-          </div>
-          <!-- Vista previa constancia -->
-          <div class="constancia-preview" id="constancia-preview">
-            <div class="const-header">
-              <div class="const-logo-area">
-                <div class="const-escudo" aria-hidden="true">🏛</div>
-                <div>
-                  <div class="const-inst">Subsecretaría de Derechos Humanos y Población</div>
-                  <div class="const-gov">Gobierno de Michoacán</div>
-                </div>
-              </div>
-            </div>
-            <div class="const-body">
-              <p class="const-texto-certifica">CERTIFICA QUE</p>
-              <p class="const-nombre" id="const-nombre">_____________________</p>
-              <p class="const-texto">ha completado satisfactoriamente el curso</p>
-              <p class="const-curso">{curso.titulo}</p>
-              <p class="const-fecha" id="const-fecha"></p>
-              <div class="const-divider"></div>
-              <p class="const-firma-titulo">Subsecretaría de Derechos Humanos y Población</p>
-              <p class="const-firma-sub">Gobierno del Estado de Michoacán</p>
             </div>
           </div>
 
@@ -325,9 +537,40 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
               id="nombre-constancia"
               class="form-input"
               placeholder="Escribe tu nombre completo"
-              oninput="actualizarNombre(this.value)"
+              autocomplete="off"
               style="max-width:400px"
             />
+            <span class="form-hint">Este dato solo se usa para imprimir tu constancia; no se guarda en ningún lado.</span>
+          </div>
+
+          <!-- Vista previa constancia -->
+          <div class="constancia-preview-scroll">
+            <div class="constancia-preview" id="constancia-preview">
+              <div class="const-header">
+                <div class="const-logo-area">
+                  <div class="const-escudo" aria-hidden="true">🏛</div>
+                  <div>
+                    <div class="const-inst">Subsecretaría de Derechos Humanos y Población</div>
+                    <div class="const-gov">Gobierno de Michoacán</div>
+                  </div>
+                </div>
+              </div>
+              <div class="const-body">
+                <p class="const-texto-certifica">Se otorga la presente constancia a:</p>
+                <p class="const-nombre" id="const-nombre">_____________________</p>
+                <p class="const-texto">por haber completado satisfactoriamente el</p>
+                <p class="const-curso">{NOMBRE_CONSTANCIA}</p>
+                <p class="const-fecha" id="const-fecha"></p>
+
+                <div class="const-firma">
+                  <div class="const-firma-linea"></div>
+                  <p class="const-firma-titulo">Subsecretario de Derechos Humanos y Población</p>
+                  <p class="const-firma-sub">Gobierno del Estado de Michoacán</p>
+                </div>
+
+                <p class="const-folio" id="const-folio"></p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -338,27 +581,40 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
 </BaseLayout>
 
 <script>
-  // Estado del curso
+  import { guardarProgreso, obtenerProgreso, limpiarProgreso } from '../../utils/cursoStorage.js';
+
+  const CURSO_ID = 'intro';
   const totalModulos = 6;
   let completados = new Set<number>();
   let moduloActual = 1;
 
   function irModulo(id: number) {
-    // Ocultar todos
     document.querySelectorAll('.modulo-card').forEach(el => el.setAttribute('hidden', ''));
     document.getElementById('pantalla-constancia')?.setAttribute('hidden', '');
 
-    // Mostrar el seleccionado
     document.getElementById(`modulo-${id}`)?.removeAttribute('hidden');
     moduloActual = id;
 
-    // Scroll al inicio del contenido
     document.querySelector('.curso-main')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Actualizar índice activo
     document.querySelectorAll('.modulo-index-btn').forEach(btn => {
       btn.classList.toggle('active', Number(btn.getAttribute('data-modulo')) === id);
     });
+
+    cerrarSidebar();
+  }
+
+  function toggleSidebar() {
+    const toggle = document.getElementById('sidebar-toggle');
+    const panel  = document.getElementById('sidebar-collapsible');
+    const abierto = toggle?.getAttribute('aria-expanded') === 'true';
+    toggle?.setAttribute('aria-expanded', String(!abierto));
+    panel?.classList.toggle('is-open', !abierto);
+  }
+
+  function cerrarSidebar() {
+    document.getElementById('sidebar-toggle')?.setAttribute('aria-expanded', 'false');
+    document.getElementById('sidebar-collapsible')?.classList.remove('is-open');
   }
 
   function responderQuiz(btn: HTMLElement) {
@@ -368,7 +624,6 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     const area = btn.closest('.quiz-area');
     const feedback = document.getElementById(`fb-${moduloId}`);
 
-    // Desactivar botones
     area?.querySelectorAll('.quiz-opcion').forEach((b, i) => {
       (b as HTMLButtonElement).disabled = true;
       if (i === correcta) b.classList.add('opcion-correcta');
@@ -385,14 +640,11 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
         : `❌ No es la respuesta correcta, pero puedes continuar. La respuesta correcta está marcada en verde.`;
     }
 
-    // Marcar como completado
     completados.add(moduloId);
+    guardarProgreso(CURSO_ID, moduloId);
     document.getElementById(`check-${moduloId}`)?.removeAttribute('hidden');
-
-    // Habilitar siguiente
     document.getElementById(`siguiente-${moduloId}`)?.removeAttribute('disabled');
 
-    // Actualizar progreso
     actualizarProgreso();
   }
 
@@ -412,22 +664,82 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     document.getElementById('pantalla-constancia')?.removeAttribute('hidden');
 
     const fecha = new Date().toLocaleDateString('es-MX', {
-      year: 'numeric', month: 'long', day: 'numeric'
+      year: 'numeric', month: 'long', day: 'numeric',
     });
-    const el = document.getElementById('const-fecha');
-    if (el) el.textContent = `Michoacán, ${fecha}`;
+    const elFecha = document.getElementById('const-fecha');
+    if (elFecha) elFecha.textContent = `Michoacán, ${fecha}`;
+
+    // Folio único de la constancia — no identifica a la persona, solo el momento de emisión.
+    const elFolio = document.getElementById('const-folio');
+    if (elFolio) elFolio.textContent = `Folio: ${Date.now()}`;
+
+    document.getElementById('pantalla-constancia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function actualizarNombre(valor: string) {
+    // Solo se refleja en pantalla (textContent, sin HTML) — nunca se guarda en localStorage.
     const el = document.getElementById('const-nombre');
     if (el) el.textContent = valor || '_____________________';
   }
 
-  async function descargarConstancia() {
+  function imprimirConstancia() {
     window.print();
   }
 
-  // Activar primer módulo
+  function reiniciarCurso() {
+    const confirmado = window.confirm('¿Seguro que quieres reiniciar tu progreso en este curso? Se perderán tus respuestas guardadas.');
+    if (!confirmado) return;
+
+    limpiarProgreso(CURSO_ID);
+    completados.clear();
+
+    document.querySelectorAll('.modulo-check').forEach(el => el.setAttribute('hidden', ''));
+    document.querySelectorAll<HTMLButtonElement>('.modulo-siguiente').forEach(btn => btn.setAttribute('disabled', ''));
+    document.querySelectorAll<HTMLButtonElement>('.quiz-opcion').forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('opcion-correcta', 'opcion-incorrecta');
+    });
+    document.querySelectorAll('.quiz-feedback').forEach(fb => fb.setAttribute('hidden', ''));
+
+    actualizarProgreso();
+    irModulo(1);
+  }
+
+  // ── Restaurar progreso guardado en localStorage ──
+  obtenerProgreso(CURSO_ID).forEach(moduloId => {
+    completados.add(moduloId);
+    document.getElementById(`check-${moduloId}`)?.removeAttribute('hidden');
+    document.getElementById(`siguiente-${moduloId}`)?.removeAttribute('disabled');
+  });
+  actualizarProgreso();
+
+  // ── Wiring de eventos (sin onclick/oninput inline: este <script> es un
+  // módulo ES y sus funciones no quedan expuestas en window) ──
+  document.getElementById('sidebar-toggle')?.addEventListener('click', toggleSidebar);
+
+  document.querySelectorAll<HTMLButtonElement>('.js-ir-modulo').forEach(btn => {
+    btn.addEventListener('click', () => irModulo(Number(btn.getAttribute('data-target'))));
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.quiz-opcion').forEach(btn => {
+    btn.addEventListener('click', () => responderQuiz(btn));
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.js-generar-constancia').forEach(btn => {
+    btn.addEventListener('click', generarConstancia);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.js-imprimir-constancia').forEach(btn => {
+    btn.addEventListener('click', imprimirConstancia);
+  });
+
+  document.getElementById('nombre-constancia')?.addEventListener('input', (e) => {
+    actualizarNombre((e.target as HTMLInputElement).value);
+  });
+
+  document.getElementById('btn-reiniciar-curso')?.addEventListener('click', reiniciarCurso);
+
+  // Activar primer módulo en el índice
   document.querySelector('[data-modulo="1"]')?.classList.add('active');
 </script>
 
@@ -489,25 +801,43 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   /* Layout */
   .curso-layout {
     display: grid;
-    gap: var(--space-8);
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
     align-items: start;
   }
 
   @media (min-width: 900px) {
-    .curso-layout { grid-template-columns: 280px 1fr; }
+    .curso-layout { grid-template-columns: 280px 1fr; gap: var(--space-8); }
   }
 
   /* Sidebar */
   .modulos-sidebar {
-    position: sticky;
-    top: calc(64px + var(--space-4));
+    position: static;
+  }
+
+  @media (min-width: 900px) {
+    .modulos-sidebar {
+      position: sticky;
+      top: calc(64px + var(--space-4));
+    }
   }
 
   .sidebar-inner {
     background: var(--color-blanco);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    padding: var(--space-6);
+    padding: clamp(1rem, 4vw, var(--space-6));
+  }
+
+  /* Toggle acordeón (solo visible/funcional en móvil) */
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 48px;
+    cursor: default;
   }
 
   .sidebar-title {
@@ -516,7 +846,40 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--color-salvia);
-    margin-bottom: var(--space-4);
+  }
+
+  .sidebar-toggle-icon {
+    display: none;
+    font-size: var(--text-lg);
+    color: var(--color-guinda);
+    transition: transform var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .sidebar-collapsible {
+    padding-top: var(--space-4);
+  }
+
+  @media (max-width: 899px) {
+    .sidebar-toggle {
+      cursor: pointer;
+    }
+
+    .sidebar-toggle-icon {
+      display: inline-block;
+    }
+
+    .sidebar-toggle[aria-expanded="true"] .sidebar-toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .sidebar-collapsible {
+      display: none;
+    }
+
+    .sidebar-collapsible.is-open {
+      display: block;
+    }
   }
 
   .modulos-index {
@@ -529,6 +892,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
 
   .modulo-index-btn {
     width: 100%;
+    min-height: 48px;
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -568,7 +932,13 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     color: var(--color-blanco);
   }
 
-  .modulo-index-titulo { flex: 1; line-height: 1.3; }
+  .modulo-index-titulo {
+    flex: 1;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+  }
 
   .modulo-check {
     color: var(--semaforo-verde);
@@ -606,6 +976,28 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     transition: width 0.6s ease;
   }
 
+  .btn-reiniciar {
+    width: 100%;
+    min-height: 44px;
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-salvia-light);
+    background: transparent;
+    color: var(--color-salvia);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .btn-reiniciar:hover {
+    border-color: var(--color-guinda);
+    color: var(--color-guinda);
+    background: var(--color-fondo-alt);
+  }
+
   /* Tarjeta de módulo */
   .modulo-card {
     background: var(--color-blanco);
@@ -616,7 +1008,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
 
   .modulo-header {
     background: linear-gradient(135deg, var(--color-guinda), var(--color-morado));
-    padding: var(--space-6) var(--space-8);
+    padding: clamp(1rem, 4vw, var(--space-6)) clamp(1rem, 5vw, var(--space-8));
   }
 
   .modulo-numero {
@@ -631,16 +1023,21 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   }
 
   .modulo-titulo {
-    font-size: var(--text-2xl);
+    font-size: clamp(1.25rem, 5vw, var(--text-2xl));
     font-weight: 900;
+    line-height: 1.25;
     color: var(--color-blanco);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .modulo-contenido {
-    padding: var(--space-8);
+    padding: clamp(1.25rem, 5vw, var(--space-8));
     font-size: var(--text-base);
     line-height: 1.8;
     color: var(--color-texto);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .modulo-contenido :global(p) { margin-bottom: var(--space-4); }
@@ -660,11 +1057,281 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     list-style-position: outside;
     color: var(--color-texto-muted);
     line-height: 1.6;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  /* Subtítulos, citas, destacados y reflexión dentro del contenido */
+  .modulo-contenido :global(.modulo-subtitulo) {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: var(--color-guinda);
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-2);
+  }
+
+  .modulo-contenido :global(.modulo-cita) {
+    border-left: 4px solid var(--color-rosa);
+    background: var(--color-rosa-light);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-md);
+    margin-block: var(--space-4);
+  }
+  .modulo-contenido :global(.modulo-cita p) {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-guinda);
+    font-style: italic;
+    line-height: 1.5;
+    margin-bottom: var(--space-2);
+  }
+  .modulo-contenido :global(.modulo-cita cite) {
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    font-style: normal;
+  }
+
+  .modulo-contenido :global(.modulo-reflexion) {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--color-guinda);
+    padding-block: var(--space-6);
+    font-style: italic;
+  }
+
+  .modulo-contenido :global(.modulo-destacado) {
+    background: var(--color-fondo-alt);
+    border: 2px solid var(--color-salvia-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    margin-block: var(--space-4);
+  }
+  .modulo-contenido :global(.modulo-destacado-titulo) {
+    display: block;
+    font-family: var(--font-display);
+    color: var(--color-guinda);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .modulo-contenido :global(.modulo-destacado p) {
+    color: var(--color-texto);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .modulo-contenido :global(.modulo-lista-numerada) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-block: var(--space-3);
+    padding-left: var(--space-5);
+  }
+  .modulo-contenido :global(.modulo-lista-numerada li) {
+    list-style: decimal;
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    line-height: 1.6;
+  }
+
+  /* Timeline */
+  .modulo-contenido :global(.modulo-timeline) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-block: var(--space-4);
+    border-left: 3px solid var(--color-salvia-light);
+    padding-left: var(--space-5);
+  }
+  .modulo-contenido :global(.timeline-item) { position: relative; }
+  .modulo-contenido :global(.timeline-item::before) {
+    content: '';
+    position: absolute;
+    left: calc(-1 * var(--space-5) - 5px);
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-guinda);
+  }
+  .modulo-contenido :global(.timeline-anio) {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: var(--color-guinda);
+    font-size: var(--text-sm);
+  }
+  .modulo-contenido :global(.timeline-texto) {
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+  }
+
+  /* Tabla comparativa (como tarjetas, no <table>) */
+  .modulo-contenido :global(.modulo-comparativa) {
+    display: grid;
+    gap: var(--space-4);
+    margin-block: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 768px) {
+    .modulo-contenido :global(.modulo-comparativa) { grid-template-columns: repeat(3, 1fr); }
+  }
+  .modulo-contenido :global(.comparativa-card) {
+    background: var(--color-fondo-alt);
+    border: 2px solid var(--color-salvia-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+  }
+  .modulo-contenido :global(.comparativa-nombre) {
+    font-size: var(--text-base);
+    font-weight: 800;
+    color: var(--color-guinda);
+    margin-bottom: var(--space-3);
+  }
+  .modulo-contenido :global(.comparativa-lista) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .modulo-contenido :global(.comparativa-item dt) {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-salvia);
+  }
+  .modulo-contenido :global(.comparativa-item dd) {
+    font-size: var(--text-sm);
+    color: var(--color-texto);
+    margin: 0;
+  }
+
+  /* Generaciones */
+  .modulo-contenido :global(.modulo-generaciones) {
+    display: grid;
+    gap: var(--space-4);
+    margin-block: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .modulo-contenido :global(.modulo-generaciones) { grid-template-columns: 1fr 1fr; }
+  }
+  .modulo-contenido :global(.generacion-card) {
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    color: var(--color-blanco);
+  }
+  .modulo-contenido :global(.generacion-1) { background: var(--color-guinda); }
+  .modulo-contenido :global(.generacion-2) { background: var(--color-morado); }
+  .modulo-contenido :global(.generacion-3) { background: var(--color-salvia); }
+  .modulo-contenido :global(.generacion-4) { background: var(--color-guinda-dark); }
+  .modulo-contenido :global(.generacion-numero) {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 900;
+    color: var(--color-rosa);
+  }
+  .modulo-contenido :global(.generacion-titulo) {
+    font-size: var(--text-base);
+    font-weight: 800;
+    color: var(--color-blanco);
+    margin-block: var(--space-1);
+  }
+  .modulo-contenido :global(.generacion-epoca) {
+    display: block;
+    font-size: var(--text-xs);
+    color: rgba(255,255,255,0.70);
+    margin-bottom: var(--space-3);
+  }
+  .modulo-contenido :global(.generacion-desc) {
+    font-size: var(--text-sm);
+    color: rgba(255,255,255,0.90);
+    margin-bottom: var(--space-3);
+  }
+  .modulo-contenido :global(.generacion-ejemplos) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-left: 0;
+  }
+  .modulo-contenido :global(.generacion-ejemplos li) {
+    list-style: none;
+    padding-left: 0;
+    font-size: var(--text-xs);
+    background: rgba(255,255,255,0.15);
+    color: var(--color-blanco);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Pirámide normativa */
+  .modulo-contenido :global(.modulo-piramide) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    margin-block: var(--space-4);
+  }
+  .modulo-contenido :global(.piramide-nivel) {
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    color: var(--color-blanco);
+    text-align: center;
+  }
+  .modulo-contenido :global(.piramide-etiqueta) {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-1);
+  }
+  .modulo-contenido :global(.piramide-desc) {
+    font-size: var(--text-xs);
+    color: rgba(255,255,255,0.85);
+    margin: 0;
+  }
+
+  /* Contactos */
+  .modulo-contenido :global(.modulo-contactos) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-block: var(--space-4);
+  }
+  .modulo-contenido :global(.contacto-chip) {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-rosa-light);
+    border: 2px solid var(--color-rosa);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    min-height: 48px;
+    justify-content: center;
+    transition: background var(--transition-fast);
+  }
+  .modulo-contenido :global(.contacto-chip:hover) { background: var(--color-rosa); }
+  .modulo-contenido :global(.contacto-chip-nombre) {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-guinda);
+  }
+  .modulo-contenido :global(.contacto-chip-tel) {
+    font-size: var(--text-xs);
+    color: var(--color-texto-muted);
   }
 
   /* Quiz */
   .quiz-area {
-    margin: 0 var(--space-8) var(--space-8);
+    margin: 0 clamp(0.75rem, 4vw, var(--space-8)) clamp(0.75rem, 4vw, var(--space-8));
     background: var(--color-fondo-alt);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -672,7 +1339,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   }
 
   .quiz-header {
-    padding: var(--space-6);
+    padding: clamp(1rem, 4vw, var(--space-6));
     background: var(--color-rosa-light);
     border-bottom: 2px solid var(--color-rosa);
   }
@@ -690,14 +1357,16 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
 
   .quiz-pregunta {
     font-family: var(--font-display);
-    font-size: var(--text-lg);
+    font-size: clamp(1rem, 4vw, var(--text-lg));
     font-weight: 700;
     color: var(--color-guinda);
     line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .quiz-opciones {
-    padding: var(--space-4) var(--space-6);
+    padding: clamp(0.75rem, 3vw, var(--space-4)) clamp(0.75rem, 4vw, var(--space-6));
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -705,18 +1374,22 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
 
   .quiz-opcion {
     display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-height: 48px;
+    padding: var(--space-3) clamp(0.75rem, 3vw, var(--space-5));
     border: 2px solid var(--color-salvia-light);
     border-radius: var(--radius-md);
     font-family: var(--font-body);
     font-size: var(--text-base);
+    line-height: 1.4;
     text-align: left;
     background: var(--color-blanco);
     color: var(--color-texto);
     transition: all var(--transition-fast);
     cursor: pointer;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .quiz-opcion:hover:not(:disabled) {
@@ -737,6 +1410,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     font-weight: 700;
     font-size: var(--text-sm);
     flex-shrink: 0;
+    margin-top: 2px;
   }
 
   :global(.opcion-correcta) {
@@ -752,12 +1426,14 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   }
 
   .quiz-feedback {
-    margin: 0 var(--space-6) var(--space-6);
-    padding: var(--space-4) var(--space-5);
+    margin: 0 clamp(0.75rem, 4vw, var(--space-6)) clamp(0.75rem, 4vw, var(--space-6));
+    padding: var(--space-4) clamp(0.75rem, 3vw, var(--space-5));
     border-radius: var(--radius-md);
     font-family: var(--font-display);
     font-weight: 600;
     font-size: var(--text-sm);
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   :global(.quiz-feedback-ok) {
@@ -775,11 +1451,28 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   /* Navegación módulo */
   .modulo-nav {
     display: flex;
-    justify-content: space-between;
-    padding: var(--space-6) var(--space-8);
+    flex-direction: column-reverse;
+    padding: clamp(1rem, 4vw, var(--space-6)) clamp(1rem, 5vw, var(--space-8));
     border-top: 1px solid var(--color-salvia-light);
-    gap: var(--space-4);
-    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .modulo-nav .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  @media (min-width: 900px) {
+    .modulo-nav {
+      flex-direction: row;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .modulo-nav .btn {
+      width: auto;
+    }
   }
 
   .modulo-siguiente:disabled {
@@ -790,42 +1483,74 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
   /* Constancia */
   .constancia-hero {
     text-align: center;
-    padding: var(--space-16);
+    padding: clamp(2rem, 8vw, var(--space-16));
     background: var(--color-blanco);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--space-8);
   }
 
-  .constancia-icon { font-size: 5rem; margin-bottom: var(--space-4); }
+  .constancia-icon { font-size: clamp(3rem, 12vw, 5rem); margin-bottom: var(--space-4); }
 
   .constancia-hero h2 {
-    font-size: var(--text-3xl);
+    font-size: clamp(1.5rem, 6vw, var(--text-3xl));
     font-weight: 900;
     color: var(--color-guinda);
     margin-bottom: var(--space-3);
+    overflow-wrap: break-word;
   }
 
   .constancia-hero p {
     color: var(--color-texto-muted);
     font-size: var(--text-lg);
     margin-bottom: var(--space-2);
+    overflow-wrap: break-word;
   }
 
   .constancia-actions {
     display: flex;
-    gap: var(--space-4);
+    flex-direction: column;
+    gap: var(--space-3);
     justify-content: center;
-    flex-wrap: wrap;
     margin-top: var(--space-8);
+  }
+
+  .constancia-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+  }
+
+  @media (min-width: 480px) {
+    .constancia-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .constancia-actions .btn { width: auto; }
   }
 
   .constancia-nombre-form {
     background: var(--color-blanco);
-    padding: var(--space-6);
+    padding: clamp(1rem, 4vw, var(--space-6));
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-6);
     box-shadow: var(--shadow-sm);
+  }
+
+  .constancia-nombre-form .form-hint {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-texto-muted);
+    margin-top: var(--space-2);
+  }
+
+  /* Wrapper de scroll horizontal para móvil */
+  .constancia-preview-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: var(--space-8);
   }
 
   /* Constancia visual */
@@ -833,11 +1558,12 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     background: var(--color-blanco);
     border: 3px solid var(--color-guinda);
     border-radius: var(--radius-lg);
-    padding: var(--space-8);
+    padding: clamp(1.5rem, 6vw, var(--space-8));
     text-align: center;
+    width: 100%;
     max-width: 600px;
+    min-width: 480px;
     margin-inline: auto;
-    margin-bottom: var(--space-8);
     box-shadow: var(--shadow-md);
   }
 
@@ -883,6 +1609,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     border-bottom: 2px solid var(--color-guinda);
     padding-bottom: var(--space-2);
     min-height: 50px;
+    overflow-wrap: break-word;
   }
 
   .const-texto {
@@ -897,6 +1624,7 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     font-weight: 800;
     color: var(--color-guinda);
     margin-bottom: var(--space-4);
+    overflow-wrap: break-word;
   }
 
   .const-fecha {
@@ -904,12 +1632,16 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     color: var(--color-texto-muted);
   }
 
-  .const-divider {
-    width: 60%;
-    height: 2px;
+  .const-firma {
+    margin-top: var(--space-8);
+  }
+
+  .const-firma-linea {
+    width: 220px;
+    height: 1px;
     background: var(--color-guinda);
-    margin: var(--space-8) auto var(--space-4);
-    opacity: 0.3;
+    opacity: 0.5;
+    margin: 0 auto var(--space-2);
   }
 
   .const-firma-titulo {
@@ -924,11 +1656,56 @@ En Michoacán, la CEDH puede recibir quejas cuando el Estado incumple estos dere
     color: var(--color-salvia);
   }
 
-  /* Print */
+  .const-folio {
+    margin-top: var(--space-6);
+    font-size: var(--text-xs);
+    color: var(--color-salvia);
+    font-family: monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* ══════════════════════════════════════════
+     IMPRESIÓN — constancia en página completa
+     ══════════════════════════════════════════ */
   @media print {
+    @page {
+      size: landscape;
+      margin: 0;
+    }
+
+    html, body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    header, footer,
     .curso-hero, .modulos-sidebar, .modulo-card,
     .constancia-hero, .constancia-nombre-form,
-    header, footer { display: none !important; }
-    .constancia-preview { box-shadow: none; border-width: 1px; }
+    .quiz-area, .modulo-nav, .curso-back {
+      display: none !important;
+    }
+
+    .constancia-preview-scroll {
+      overflow: visible;
+      margin: 0;
+    }
+
+    .constancia-preview {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      min-width: 0;
+      margin: 0;
+      border: 12px solid var(--color-guinda);
+      box-shadow: none;
+      border-radius: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--color-blanco);
+      page-break-inside: avoid;
+    }
   }
 </style>

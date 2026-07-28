@@ -5,7 +5,7 @@ import { withBase } from '../utils/url';
 
 <BaseLayout
   title="Inicio"
-  description="Portal de la Subsecretaría de Derechos Humanos y Población de Michoacán. Consulta tu recomendación CEDH/CNDH, accede a cursos gratuitos y conoce tus derechos."
+  description="Portal de la Subsecretaría de Derechos Humanos y Población de Michoacán. Accede a cursos gratuitos de derechos humanos y conoce nuestro trabajo."
 >
 
   <!-- ══════════════ HERO ══════════════ -->
@@ -19,55 +19,16 @@ import { withBase } from '../utils/url';
           <span class="hero-title-accent">transparentes y al alcance</span>
         </h1>
         <p class="hero-desc">
-          Consulta en tiempo real el avance de tu recomendación CEDH o CNDH,
-          capacítate en derechos humanos de forma gratuita y conoce cómo trabajamos
+          Capacítate en derechos humanos de forma gratuita y conoce cómo trabajamos
           para ti desde Michoacán.
         </p>
         <div class="hero-actions">
-          <a href={withBase('/semaforo')} class="btn btn-primary hero-btn-main">
-            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            Consultar mi caso
+          <a href={withBase('/cursos')} class="btn btn-primary hero-btn-main">
+            Ver cursos
           </a>
-          <a href={withBase('/cursos')} class="btn btn-outline hero-btn-sec">
-            Ver cursos gratuitos →
+          <a href={withBase('/nosotros')} class="btn btn-outline hero-btn-sec">
+            Conoce tus derechos
           </a>
-        </div>
-      </div>
-
-      <!-- Semáforo decorativo / preview -->
-      <div class="hero-visual" aria-hidden="true">
-        <div class="semaforo-preview">
-          <div class="sp-label">Estado de recomendaciones</div>
-          <div class="sp-items">
-            <div class="sp-item sp-verde">
-              <div class="sp-dot">
-                <div class="sp-ring"></div>
-              </div>
-              <div>
-                <div class="sp-item-title">Cumplida</div>
-                <div class="sp-item-sub">Recomendación atendida</div>
-              </div>
-            </div>
-            <div class="sp-item sp-amarillo">
-              <div class="sp-dot">
-                <div class="sp-ring"></div>
-              </div>
-              <div>
-                <div class="sp-item-title">En proceso</div>
-                <div class="sp-item-sub">Seguimiento activo</div>
-              </div>
-            </div>
-            <div class="sp-item sp-rojo">
-              <div class="sp-dot">
-                <div class="sp-ring"></div>
-              </div>
-              <div>
-                <div class="sp-item-title">Pendiente</div>
-                <div class="sp-item-sub">Requiere atención</div>
-              </div>
-            </div>
-          </div>
-          <a href={withBase('/semaforo')} class="sp-cta">Consultar número de expediente →</a>
         </div>
       </div>
     </div>
@@ -85,13 +46,6 @@ import { withBase } from '../utils/url';
     <div class="container">
       <h2 class="sr-only">Servicios principales</h2>
       <div class="qa-grid">
-
-        <a href={withBase('/semaforo')} class="qa-card qa-card-guinda">
-          <div class="qa-icon" aria-hidden="true">🔍</div>
-          <h3>Consulta tu recomendación</h3>
-          <p>Sigue en tiempo real el avance de tu recomendación CEDH o CNDH.</p>
-          <span class="qa-link">Consultar ahora →</span>
-        </a>
 
         <a href={withBase('/cursos')} class="qa-card qa-card-morado">
           <div class="qa-icon" aria-hidden="true">📚</div>
@@ -222,15 +176,15 @@ import { withBase } from '../utils/url';
   <!-- ══════════════ CTA FINAL ══════════════ -->
   <section class="section cta-section" aria-label="Llamada a la acción">
     <div class="container text-center">
-      <h2 class="section-title">¿Tienes una recomendación activa?</h2>
+      <h2 class="section-title">¿Quieres conocer más sobre tus derechos?</h2>
       <div class="divider divider-center"></div>
       <p class="section-subtitle" style="margin-top:var(--space-3)">
-        Consulta su estado en tiempo real. Sin trámites, sin esperas, sin burocracia.
-        Solo ingresa tu número de expediente.
+        Capacítate gratis con nuestros cursos de derechos humanos. Sin trámites,
+        sin costo, a tu propio ritmo.
       </p>
       <div style="margin-top:var(--space-8);display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
-        <a href={withBase('/semaforo')} class="btn btn-primary" style="font-size:var(--text-lg);padding:var(--space-4) var(--space-8);">
-          Consultar ahora
+        <a href={withBase('/cursos')} class="btn btn-primary" style="font-size:var(--text-lg);padding:var(--space-4) var(--space-8);">
+          Ver cursos gratuitos
         </a>
         <a href={withBase('/contacto')} class="btn btn-secondary">Necesito ayuda</a>
       </div>
@@ -258,16 +212,16 @@ import { withBase } from '../utils/url';
   }
 
   .hero-content {
-    display: grid;
-    gap: var(--space-12);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
+    max-width: 720px;
+    margin-inline: auto;
+    gap: var(--space-2);
     padding-bottom: var(--space-16);
     position: relative;
     z-index: 1;
-  }
-
-  @media (min-width: 900px) {
-    .hero-content { grid-template-columns: 1fr 1fr; }
   }
 
   .hero-eyebrow {
@@ -328,96 +282,6 @@ import { withBase } from '../utils/url';
     font-size: var(--text-base);
   }
 
-  /* Semáforo preview */
-  .semaforo-preview {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,195,208,0.20);
-    border-radius: var(--radius-lg);
-    padding: var(--space-8);
-    backdrop-filter: blur(8px);
-    max-width: 400px;
-  }
-
-  .sp-label {
-    font-family: var(--font-display);
-    font-size: var(--text-xs);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-rosa);
-    margin-bottom: var(--space-6);
-  }
-
-  .sp-items {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
-  }
-
-  .sp-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    color: var(--color-blanco);
-  }
-
-  .sp-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sp-ring {
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 2px solid;
-    animation: pulse-ring 2.5s ease-in-out infinite;
-    opacity: 0.4;
-  }
-
-  .sp-verde  .sp-dot { background: var(--semaforo-verde); }
-  .sp-verde  .sp-ring { border-color: var(--semaforo-verde); animation-delay: 0s; }
-
-  .sp-amarillo .sp-dot { background: var(--semaforo-amarillo); }
-  .sp-amarillo .sp-ring { border-color: var(--semaforo-amarillo); animation-delay: 0.8s; }
-
-  .sp-rojo .sp-dot { background: var(--semaforo-rojo); }
-  .sp-rojo .sp-ring { border-color: var(--semaforo-rojo); animation-delay: 1.6s; }
-
-  .sp-item-title {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--text-base);
-  }
-
-  .sp-item-sub {
-    font-size: var(--text-xs);
-    color: rgba(255,255,255,0.55);
-  }
-
-  .sp-cta {
-    font-family: var(--font-display);
-    font-size: var(--text-sm);
-    font-weight: 700;
-    color: var(--color-rosa);
-    text-decoration: none;
-    border-top: 1px solid rgba(255,195,208,0.15);
-    display: block;
-    padding-top: var(--space-4);
-    transition: color var(--transition-fast);
-  }
-
-  .sp-cta:hover {
-    color: var(--color-rosa-light);
-  }
-
   .hero-wave {
     line-height: 0;
     margin-top: -1px;
@@ -441,7 +305,7 @@ import { withBase } from '../utils/url';
   }
 
   @media (min-width: 1024px) {
-    .qa-grid { grid-template-columns: repeat(4, 1fr); }
+    .qa-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   .qa-card {
@@ -478,14 +342,6 @@ import { withBase } from '../utils/url';
   }
 
   .qa-icon { font-size: 2rem; }
-
-  .qa-card-guinda {
-    background: var(--color-guinda);
-    color: var(--color-blanco);
-    border-color: var(--color-guinda-light);
-  }
-  .qa-card-guinda h3, .qa-card-guinda .qa-link { color: var(--color-rosa-light); }
-  .qa-card-guinda p { color: rgba(255,255,255,0.80); }
 
   .qa-card-morado {
     background: var(--color-morado);

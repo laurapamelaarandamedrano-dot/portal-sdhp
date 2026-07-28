@@ -1,0 +1,456 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Documento {
+  id: string;
+  nivel: 'Internacional' | 'Federal' | 'Estatal';
+  titulo: string;
+  organismo?: string;
+  anio: number | null;
+  descripcion: string;
+  url: string;
+}
+
+// TODO: sustituir 'url: "#"' por el enlace oficial al texto vigente de cada
+// documento (DOF, Congreso de Michoacán, ONU/OEA, etc.) antes de publicar.
+// TODO: verificar año de publicación / última reforma vigente en los
+// documentos marcados con anio: null.
+const documentos: Documento[] = [
+  // ── Internacional ──
+  {
+    id: 'dudh',
+    nivel: 'Internacional',
+    titulo: 'Declaración Universal de Derechos Humanos',
+    organismo: 'ONU',
+    anio: 1948,
+    descripcion: 'Primer reconocimiento global de los derechos y libertades fundamentales inherentes a toda persona.',
+    url: '#',
+  },
+  {
+    id: 'cadh',
+    nivel: 'Internacional',
+    titulo: 'Convención Americana sobre Derechos Humanos',
+    organismo: 'OEA',
+    anio: 1969,
+    descripcion: 'Pacto de San José: tratado regional americano que establece derechos civiles y políticos y crea la Corte IDH.',
+    url: '#',
+  },
+  {
+    id: 'pidcp',
+    nivel: 'Internacional',
+    titulo: 'Pacto Internacional de Derechos Civiles y Políticos',
+    organismo: 'ONU',
+    anio: 1966,
+    descripcion: 'Obliga a los Estados a respetar derechos como la libertad personal, el debido proceso y la participación política.',
+    url: '#',
+  },
+  {
+    id: 'pidesc',
+    nivel: 'Internacional',
+    titulo: 'Pacto Internacional de Derechos Económicos, Sociales y Culturales',
+    organismo: 'ONU',
+    anio: 1966,
+    descripcion: 'Reconoce derechos al trabajo, la educación, la salud y un nivel de vida adecuado, de cumplimiento progresivo.',
+    url: '#',
+  },
+  {
+    id: 'cdn',
+    nivel: 'Internacional',
+    titulo: 'Convención sobre los Derechos del Niño',
+    organismo: 'ONU',
+    anio: 1989,
+    descripcion: 'Reconoce a niñas, niños y adolescentes como sujetos plenos de derechos y establece su protección especial.',
+    url: '#',
+  },
+
+  // ── Federal ──
+  {
+    id: 'cpeum',
+    nivel: 'Federal',
+    titulo: 'Constitución Política de los Estados Unidos Mexicanos (Art. 1°)',
+    anio: 2011,
+    descripcion: 'Reconoce los derechos humanos de fuente constitucional e internacional y el principio pro persona (reforma de 2011).',
+    url: '#',
+  },
+  {
+    id: 'lgv',
+    nivel: 'Federal',
+    titulo: 'Ley General de Víctimas',
+    anio: 2013,
+    descripcion: 'Establece los derechos de las víctimas del delito y de violaciones a derechos humanos, y crea el sistema nacional de atención.',
+    url: '#',
+  },
+  {
+    id: 'lgtaip',
+    nivel: 'Federal',
+    titulo: 'Ley General de Transparencia y Acceso a la Información Pública',
+    anio: 2015,
+    descripcion: 'Fija las bases y principios para garantizar el derecho de acceso a la información en todo el país.',
+    url: '#',
+  },
+  {
+    id: 'lgpdp',
+    nivel: 'Federal',
+    titulo: 'Ley General de Protección de Datos Personales',
+    anio: 2017,
+    descripcion: 'Regula el tratamiento legítimo de datos personales en posesión de sujetos obligados y los derechos ARCO.',
+    url: '#',
+  },
+
+  // ── Estatal ──
+  {
+    id: 'cpem',
+    nivel: 'Estatal',
+    titulo: 'Constitución Política del Estado de Michoacán',
+    anio: null,
+    descripcion: 'Norma suprema del estado de Michoacán; reconoce y garantiza los derechos humanos en el ámbito local.',
+    url: '#',
+  },
+  {
+    id: 'ldhem',
+    nivel: 'Estatal',
+    titulo: 'Ley de Derechos Humanos del Estado de Michoacán',
+    anio: null,
+    descripcion: 'Regula la organización y el funcionamiento de la Comisión Estatal de Derechos Humanos (CEDH) de Michoacán.',
+    url: '#',
+  },
+  {
+    id: 'risg',
+    nivel: 'Estatal',
+    titulo: 'Reglamento Interior de la Secretaría de Gobierno',
+    anio: null,
+    descripcion: 'Define la organización, atribuciones y funcionamiento interno de la Secretaría de Gobierno y sus subsecretarías.',
+    url: '#',
+  },
+];
+
+const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 'Federal', 'Estatal'];
+---
+
+<BaseLayout
+  title="Marco Normativo"
+  description="Marco normativo internacional, federal y estatal que rige a la Subsecretaría de Derechos Humanos y Población de Michoacán."
+>
+
+  <!-- Header -->
+  <section class="normativa-hero" aria-label="Marco normativo">
+    <div class="container">
+      <span class="badge badge-rosa">Marco legal</span>
+      <h1 class="normativa-hero-title">Marco Normativo</h1>
+      <p class="normativa-hero-desc">
+        Instrumentos internacionales, leyes federales y estatales que sustentan
+        el trabajo de la Subsecretaría en materia de derechos humanos.
+      </p>
+    </div>
+  </section>
+
+  <!-- Buscador + filtros -->
+  <section class="section section-toolbar" aria-label="Buscar y filtrar documentos">
+    <div class="container">
+      <div class="normativa-toolbar">
+        <div class="normativa-buscador-wrap">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input
+            type="search"
+            id="normativa-buscador"
+            class="normativa-buscador"
+            placeholder="Buscar por nombre del documento..."
+            aria-label="Buscar por nombre del documento"
+            oninput="buscarNormativa(this.value)"
+          />
+        </div>
+
+        <div class="normativa-filtros" role="group" aria-label="Filtrar por nivel">
+          {niveles.map((nivel, i) => (
+            <button
+              type="button"
+              class:list={['filtro-btn', { 'is-active': i === 0 }]}
+              data-nivel={nivel}
+              onclick="filtrarNormativa(this)"
+            >
+              {nivel}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="normativa-grid" id="normativa-grid">
+        {documentos.map(doc => (
+          <article
+            class="normativa-card"
+            data-nivel={doc.nivel}
+            data-nombre={doc.titulo.toLowerCase()}
+          >
+            <div class="normativa-card-top">
+              <span class:list={['normativa-badge', `normativa-badge-${doc.nivel.toLowerCase()}`]}>{doc.nivel}</span>
+              <span class="normativa-anio">{doc.anio ?? 'Por confirmar'}</span>
+            </div>
+            <h3 class="normativa-titulo">{doc.titulo}</h3>
+            <p class="normativa-desc">{doc.descripcion}</p>
+            {doc.organismo && <span class="normativa-organismo">{doc.organismo}</span>}
+            <!-- TODO: reemplazar '#' por la URL oficial del texto vigente -->
+            <a href={doc.url} target="_blank" rel="noopener noreferrer" class="btn btn-secondary normativa-link">
+              Ver texto ↗
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <p class="normativa-vacio" id="normativa-vacio" hidden>
+        No se encontraron documentos que coincidan con tu búsqueda.
+      </p>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<script>
+  let filtroNivelActual = 'Todos';
+  let terminoBusqueda = '';
+
+  function aplicarFiltrosNormativa() {
+    const tarjetas = document.querySelectorAll<HTMLElement>('.normativa-card');
+    let visibles = 0;
+
+    tarjetas.forEach(card => {
+      const nivel = card.getAttribute('data-nivel') || '';
+      const nombre = card.getAttribute('data-nombre') || '';
+      const coincideNivel = filtroNivelActual === 'Todos' || nivel === filtroNivelActual;
+      const coincideBusqueda = nombre.includes(terminoBusqueda);
+      const visible = coincideNivel && coincideBusqueda;
+      card.hidden = !visible;
+      if (visible) visibles++;
+    });
+
+    const vacio = document.getElementById('normativa-vacio');
+    if (vacio) vacio.hidden = visibles > 0;
+  }
+
+  function filtrarNormativa(btn: HTMLElement) {
+    filtroNivelActual = btn.getAttribute('data-nivel') || 'Todos';
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    aplicarFiltrosNormativa();
+  }
+
+  function buscarNormativa(valor: string) {
+    terminoBusqueda = valor.trim().toLowerCase();
+    aplicarFiltrosNormativa();
+  }
+
+  // Exponer al scope global porque los controles usan onclick/oninput inline
+  (window as any).filtrarNormativa = filtrarNormativa;
+  (window as any).buscarNormativa = buscarNormativa;
+</script>
+
+<style>
+  /* Header */
+  .normativa-hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
+    padding-block: var(--space-16);
+    text-align: center;
+  }
+
+  .normativa-hero-title {
+    font-size: clamp(1.75rem, 5vw, var(--text-4xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    margin-block: var(--space-4);
+  }
+
+  .normativa-hero-desc {
+    color: rgba(255,255,255,0.80);
+    max-width: 60ch;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .section-toolbar {
+    padding-top: var(--space-12);
+  }
+
+  /* Toolbar: buscador + filtros */
+  .normativa-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .normativa-toolbar {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .normativa-buscador-wrap {
+    position: relative;
+    flex: 1;
+    max-width: 420px;
+    color: var(--color-salvia);
+  }
+
+  .normativa-buscador-wrap svg {
+    position: absolute;
+    top: 50%;
+    left: var(--space-4);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .normativa-buscador {
+    width: 100%;
+    min-height: 48px;
+    padding: var(--space-3) var(--space-4) var(--space-3) calc(var(--space-4) * 2 + 18px);
+    border: 2px solid var(--color-salvia-light);
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--color-texto);
+    background: var(--color-blanco);
+    transition: border-color var(--transition-fast);
+  }
+
+  .normativa-buscador:focus {
+    outline: none;
+    border-color: var(--color-guinda);
+  }
+
+  .normativa-filtros {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .filtro-btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--color-salvia-light);
+    background: var(--color-blanco);
+    color: var(--color-texto-muted);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .filtro-btn:hover {
+    border-color: var(--color-guinda);
+    color: var(--color-guinda);
+  }
+
+  .filtro-btn.is-active {
+    background: var(--color-guinda);
+    border-color: var(--color-guinda);
+    color: var(--color-blanco);
+  }
+
+  /* Grid de tarjetas */
+  .normativa-grid {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .normativa-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (min-width: 1024px) {
+    .normativa-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .normativa-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    transition: all var(--transition-base);
+  }
+
+  .normativa-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .normativa-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .normativa-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .normativa-badge-internacional { background: var(--color-morado); color: var(--color-blanco); }
+  .normativa-badge-federal       { background: var(--color-guinda); color: var(--color-blanco); }
+  .normativa-badge-estatal       { background: var(--color-rosa-light); color: var(--color-guinda); }
+
+  .normativa-anio {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-salvia);
+    white-space: nowrap;
+  }
+
+  .normativa-titulo {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: var(--color-guinda);
+    line-height: 1.35;
+    overflow-wrap: break-word;
+  }
+
+  .normativa-desc {
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    line-height: 1.6;
+    flex: 1;
+    overflow-wrap: break-word;
+  }
+
+  .normativa-organismo {
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-salvia);
+    background: var(--color-fondo-alt);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .normativa-link {
+    align-self: flex-start;
+    min-height: 44px;
+    margin-top: var(--space-2);
+  }
+
+  .normativa-vacio {
+    text-align: center;
+    color: var(--color-texto-muted);
+    font-size: var(--text-base);
+    padding-block: var(--space-12);
+  }
+</style>

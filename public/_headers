@@ -1,0 +1,17 @@
+# Cabeceras de seguridad — formato Netlify / Cloudflare Pages.
+#
+# NOTA IMPORTANTE: GitHub Pages NO procesa este archivo. GitHub Pages no
+# soporta cabeceras HTTP personalizadas de ningún tipo (no hay servidor
+# propio configurable). Este archivo queda listo para el día que el sitio
+# se migre a Netlify/Cloudflare Pages, o se coloque un proxy compatible
+# (por ejemplo Cloudflare gratuito) delante de GitHub Pages para inyectar
+# estas cabeceras a nivel de borde. Ver SEGURIDAD.md para el detalle
+# completo de qué protege cada cabecera y cómo aplicarlas mientras el
+# sitio siga en GitHub Pages.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

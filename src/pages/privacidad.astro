@@ -1,0 +1,212 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/url';
+
+const ULTIMA_ACTUALIZACION = '28 de julio de 2026';
+---
+
+<BaseLayout
+  title="Aviso de Privacidad"
+  description="Aviso de privacidad simplificado de la Subsecretaría de Derechos Humanos y Población de Michoacán, conforme a la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados."
+>
+
+  <!-- Header -->
+  <section class="privacidad-hero" aria-label="Aviso de privacidad">
+    <div class="container">
+      <span class="badge badge-rosa">Protección de datos personales</span>
+      <h1 class="privacidad-hero-title">Aviso de Privacidad</h1>
+      <p class="privacidad-hero-desc">
+        Aviso simplificado, conforme a la Ley General de Protección de Datos
+        Personales en Posesión de Sujetos Obligados.
+      </p>
+    </div>
+  </section>
+
+  <!-- Contenido -->
+  <section class="section" aria-label="Contenido del aviso de privacidad">
+    <div class="container privacidad-layout">
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Responsable del tratamiento</h2>
+        <p>
+          La <strong>Subsecretaría de Derechos Humanos y Población</strong>, adscrita a la
+          Secretaría de Gobierno del Estado de Michoacán, con domicilio en
+          Av. Acueducto s/n, Col. Ex-Hacienda de Guadalupe, Morelia, Michoacán,
+          México, es responsable del tratamiento de los datos personales que
+          recibe a través de este sitio web.
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Datos personales que recabamos</h2>
+        <p>
+          Este sitio <strong>solo</strong> recaba datos personales a través del
+          formulario de la página de <a href={withBase('/contacto')}>Contacto</a>. Los datos
+          solicitados son:
+        </p>
+        <ul class="privacidad-lista">
+          <li>Nombre completo</li>
+          <li>Correo electrónico</li>
+          <li>Mensaje (contenido de tu duda, denuncia o solicitud)</li>
+        </ul>
+        <p>
+          No recabamos ningún otro dato personal en ninguna otra sección del
+          sitio. El resto de las páginas (cursos, organigrama, marco
+          normativo) no piden ni almacenan información que te identifique.
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Finalidad del tratamiento</h2>
+        <p>
+          Los datos que nos compartes en el formulario de contacto se usan
+          <strong>única y exclusivamente</strong> para atender tu solicitud,
+          duda o denuncia, y para responderte por el mismo medio o por
+          teléfono si lo dejaste. No se usan para ningún otro fin —no se
+          elaboran perfiles, no se usan con fines comerciales ni de
+          mercadotecnia.
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Cookies y rastreo</h2>
+        <p>
+          Este sitio <strong>no utiliza cookies de rastreo</strong>, píxeles
+          de redes sociales, ni herramientas de analítica de terceros (como
+          Google Analytics). No se te sigue de un sitio a otro ni se
+          construye un perfil de tu navegación.
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Transferencia de datos</h2>
+        <p>
+          <strong>No transferimos tus datos personales a ningún tercero</strong>,
+          salvo que exista una obligación legal expresa que nos obligue a
+          hacerlo (por ejemplo, un requerimiento de autoridad competente).
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Derechos ARCO</h2>
+        <p>
+          Tienes derecho a <strong>Acceder</strong> a tus datos personales,
+          <strong>Rectificarlos</strong> si son inexactos, solicitar su
+          <strong>Cancelación</strong> cuando consideres que no se requieren
+          para las finalidades señaladas, así como <strong>Oponerte</strong>
+          al tratamiento de los mismos para fines específicos (derechos ARCO).
+        </p>
+        <p>Para ejercer cualquiera de estos derechos, escríbenos a:</p>
+        <p class="privacidad-contacto">
+          📧 <a href="mailto:ddhh@michoacan.gob.mx">ddhh@michoacan.gob.mx</a><br />
+          📞 <a href="tel:+524431234567">(443) 123-4567</a>
+        </p>
+        <p>
+          Indica tu nombre, el derecho que deseas ejercer y adjunta una
+          identificación oficial para confirmar tu identidad. Responderemos
+          tu solicitud en los plazos que establece la Ley General de
+          Protección de Datos Personales en Posesión de Sujetos Obligados.
+        </p>
+      </article>
+
+      <article class="privacidad-card">
+        <h2 class="privacidad-titulo">Cambios a este aviso</h2>
+        <p>
+          Este aviso de privacidad puede actualizarse para reflejar cambios
+          en nuestras prácticas o en la legislación aplicable. Cualquier
+          cambio se publicará en esta misma página.
+        </p>
+        <p class="privacidad-fecha">
+          Última actualización: <strong>{ULTIMA_ACTUALIZACION}</strong>
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .privacidad-hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
+    padding-block: var(--space-16);
+    text-align: center;
+  }
+
+  .privacidad-hero-title {
+    font-size: clamp(1.75rem, 5vw, var(--text-4xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    margin-block: var(--space-4);
+  }
+
+  .privacidad-hero-desc {
+    color: rgba(255,255,255,0.80);
+    max-width: 60ch;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .privacidad-layout {
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .privacidad-card {
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: clamp(1.25rem, 5vw, var(--space-8));
+  }
+
+  .privacidad-titulo {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--color-guinda);
+    margin-bottom: var(--space-3);
+  }
+
+  .privacidad-card p {
+    font-size: var(--text-base);
+    color: var(--color-texto);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  .privacidad-card p:last-child { margin-bottom: 0; }
+
+  .privacidad-card a {
+    color: var(--color-guinda);
+    font-weight: 600;
+  }
+
+  .privacidad-lista {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-5);
+  }
+
+  .privacidad-lista li {
+    list-style: disc;
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    line-height: 1.6;
+  }
+
+  .privacidad-contacto {
+    background: var(--color-fondo-alt);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    line-height: 1.8;
+  }
+
+  .privacidad-fecha {
+    font-size: var(--text-sm);
+    color: var(--color-salvia);
+  }
+</style>

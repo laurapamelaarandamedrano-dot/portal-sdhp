@@ -1,26 +1,117 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase } from '../utils/url';
+
+const accesos = [
+  { href: '/',           emoji: '🏠', titulo: 'Inicio',    desc: 'Regresa a la página principal del portal.' },
+  { href: '/cursos',     emoji: '📚', titulo: 'Cursos',    desc: 'Cursos gratuitos de derechos humanos.' },
+  { href: '/normativa',  emoji: '📜', titulo: 'Normativa', desc: 'Marco legal que nos rige.' },
+  { href: '/contacto',   emoji: '💬', titulo: 'Contacto',  desc: '¿Tienes una duda? Escríbenos.' },
+];
 ---
 
 <BaseLayout title="Página no encontrada">
-  <section class="error-section" aria-label="Página no encontrada">
+  <section class="error-hero" aria-label="Página no encontrada">
     <div class="container text-center">
       <div class="error-emoji" aria-hidden="true">🔍</div>
-      <h1>Página no encontrada</h1>
-      <p>Lo sentimos, la página que buscas no existe o fue movida.</p>
-      <a href={withBase('/')} class="btn btn-primary" style="margin-top:var(--space-8)">
+      <span class="badge badge-rosa">Error 404</span>
+      <h1 class="error-title">No encontramos esta página</h1>
+      <p class="error-desc">
+        Lo sentimos: la página que buscas no existe o fue movida de lugar.
+        Pero no te preocupes, seguimos aquí para ayudarte a encontrar lo que
+        necesitas.
+      </p>
+      <a href={withBase('/')} class="btn btn-primary" style="margin-top:var(--space-6)">
         Ir al inicio →
       </a>
+    </div>
+  </section>
+
+  <section class="section" aria-label="Accesos rápidos">
+    <div class="container">
+      <h2 class="sr-only">Accesos rápidos</h2>
+      <div class="error-grid">
+        {accesos.map(a => (
+          <a href={withBase(a.href)} class="error-card">
+            <div class="error-card-emoji" aria-hidden="true">{a.emoji}</div>
+            <h3>{a.titulo}</h3>
+            <p>{a.desc}</p>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .error-section {
-    padding-block: var(--space-24);
+  .error-hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
+    padding-block: var(--space-16);
+    color: var(--color-blanco);
   }
-  .error-emoji { font-size: 5rem; margin-bottom: var(--space-6); }
-  h1 { font-size: var(--text-4xl); margin-bottom: var(--space-4); }
-  p { color: var(--color-texto-muted); font-size: var(--text-lg); }
+
+  .error-emoji {
+    font-size: clamp(3rem, 12vw, 5rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .error-title {
+    font-size: clamp(1.5rem, 5vw, var(--text-4xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    margin-block: var(--space-4);
+  }
+
+  .error-desc {
+    color: rgba(255,255,255,0.80);
+    max-width: 56ch;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  .error-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+
+  @media (min-width: 640px) {
+    .error-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .error-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    text-decoration: none;
+    border: 2px solid transparent;
+    transition: all var(--transition-base);
+  }
+
+  .error-card:hover {
+    border-color: var(--color-rosa);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .error-card-emoji { font-size: 2rem; }
+
+  .error-card h3 {
+    font-size: var(--text-lg);
+    font-weight: 800;
+    color: var(--color-guinda);
+  }
+
+  .error-card p {
+    font-size: var(--text-sm);
+    color: var(--color-texto-muted);
+    line-height: 1.6;
+  }
 </style>

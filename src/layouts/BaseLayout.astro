@@ -28,6 +28,19 @@ const siteTitle = title === 'Inicio'
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#4A001F" />
 
+  <!--
+    Seguridad: GitHub Pages no permite configurar cabeceras HTTP reales, así
+    que CSP y Referrer-Policy se entregan aquí vía <meta> (son las únicas dos
+    que los navegadores respetan por esta vía). X-Frame-Options,
+    X-Content-Type-Options y Permissions-Policy requieren una cabecera HTTP
+    de verdad y NO tienen efecto como <meta> — quedan documentadas en
+    public/_headers y SEGURIDAD.md para cuando el sitio tenga un host o
+    proxy que sí las aplique. Nota: CSP vía <meta> tampoco soporta
+    'frame-ancestors'; ese directivo solo funciona vía cabecera HTTP real.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+
   <!-- SEO -->
   <title>{siteTitle}</title>
   <meta name="description" content={description} />

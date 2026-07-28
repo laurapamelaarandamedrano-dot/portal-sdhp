@@ -1,0 +1,474 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// ────────────────────────────────────────────────────────────────
+// TODO: Verificar esta jerarquía y las descripciones contra el
+// Reglamento Interior / Manual de Organización oficial y vigente
+// de la Secretaría de Gobierno y la Subsecretaría de Derechos
+// Humanos y Población de Michoacán. La estructura, nombres de
+// puestos y descripciones de abajo son una aproximación razonable
+// para efectos de maquetación — NO son datos oficiales confirmados.
+// ────────────────────────────────────────────────────────────────
+
+interface OrgNodo {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  hijos: OrgNodo[];
+}
+
+const organigrama: OrgNodo = {
+  id: 'secretaria-gobierno',
+  nombre: 'Secretaría de Gobierno',
+  descripcion: 'Dependencia del Poder Ejecutivo estatal encargada de la política interior de Michoacán; coordina la relación con municipios y las subsecretarías adscritas, entre ellas la de Derechos Humanos y Población.',
+  hijos: [
+    {
+      id: 'subsecretaria-ddhh',
+      nombre: 'Subsecretaría de Derechos Humanos y Población',
+      descripcion: 'Diseña y coordina la política estatal de derechos humanos y de población; da seguimiento a recomendaciones de la CEDH/CNDH y articula el trabajo de sus direcciones.',
+      hijos: [
+        {
+          id: 'direccion-ddhh',
+          nombre: 'Dirección de Derechos Humanos',
+          descripcion: 'Atiende quejas ciudadanas y coordina el cumplimiento de recomendaciones en materia de derechos humanos emitidas por organismos estatales y nacionales.',
+          hijos: [
+            {
+              id: 'depto-atencion-victimas',
+              nombre: 'Departamento de Atención a Víctimas',
+              descripcion: 'Brinda acompañamiento, orientación y canalización a víctimas de violaciones a derechos humanos.',
+              hijos: [],
+            },
+            {
+              id: 'depto-seguimiento-recomendaciones',
+              nombre: 'Departamento de Seguimiento a Recomendaciones',
+              descripcion: 'Da seguimiento puntual al cumplimiento de las recomendaciones emitidas por la CEDH y la CNDH a las autoridades estatales.',
+              hijos: [],
+            },
+          ],
+        },
+        {
+          id: 'direccion-poblacion',
+          nombre: 'Dirección de Población',
+          descripcion: 'Coordina la política de población del estado, incluyendo el Registro Civil y la atención a la movilidad humana.',
+          hijos: [
+            {
+              id: 'depto-registro-civil',
+              nombre: 'Departamento de Registro Civil',
+              descripcion: 'Supervisa el funcionamiento de las oficialías del Registro Civil en el estado de Michoacán.',
+              hijos: [],
+            },
+            {
+              id: 'depto-migracion',
+              nombre: 'Departamento de Migración',
+              descripcion: 'Atiende asuntos relacionados con personas migrantes y protege sus derechos dentro del estado.',
+              hijos: [],
+            },
+          ],
+        },
+        {
+          id: 'direccion-juridica',
+          nombre: 'Dirección Jurídica',
+          descripcion: 'Brinda asesoría legal a la Subsecretaría y da seguimiento a la normatividad aplicable a sus funciones.',
+          hijos: [
+            {
+              id: 'depto-normatividad',
+              nombre: 'Departamento de Normatividad',
+              descripcion: 'Elabora y actualiza proyectos normativos e instrumentos jurídicos de la Subsecretaría.',
+              hijos: [],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+function escapeAttr(texto: string): string {
+  return texto
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// TODO: los niveles 2+ (Direcciones) inician colapsados por diseño;
+// ajustar si el organigrama oficial definitivo tiene más/menos niveles.
+function renderNodo(nodo: OrgNodo, nivel: number): string {
+  const tieneHijos = nodo.hijos.length > 0;
+  const colapsadoPorDefecto = nivel >= 2;
+
+  const hijosHtml = tieneHijos
+    ? `<ul class="org-children${colapsadoPorDefecto ? ' is-collapsed' : ''}" role="group">
+        ${nodo.hijos.map(h => `<li class="org-item">${renderNodo(h, nivel + 1)}</li>`).join('')}
+      </ul>`
+    : '';
+
+  return `
+    <button
+      type="button"
+      class="org-node-btn org-nivel-${nivel}"
+      data-nombre="${escapeAttr(nodo.nombre)}"
+      data-desc="${escapeAttr(nodo.descripcion)}"
+      data-has-children="${tieneHijos}"
+      aria-expanded="${tieneHijos ? String(!colapsadoPorDefecto) : 'false'}"
+      onclick="toggleNodoOrg(this)"
+    >
+      <span class="org-node-label">${escapeAttr(nodo.nombre)}</span>
+      ${tieneHijos ? '<span class="org-toggle-icon" aria-hidden="true">▾</span>' : ''}
+    </button>
+    ${hijosHtml}
+  `;
+}
+
+const organigramaHtml = `<ul class="org-tree" role="tree"><li class="org-item org-root">${renderNodo(organigrama, 0)}</li></ul>`;
+---
+
+<BaseLayout
+  title="Organigrama"
+  description="Organigrama interactivo de la Subsecretaría de Derechos Humanos y Población de Michoacán: direcciones y departamentos que la integran."
+>
+
+  <!-- Header -->
+  <section class="org-hero" aria-label="Organigrama institucional">
+    <div class="container">
+      <span class="badge badge-rosa">Estructura institucional</span>
+      <h1 class="org-hero-title">Organigrama</h1>
+      <p class="org-hero-desc">
+        Conoce las direcciones y departamentos de la Subsecretaría de Derechos Humanos
+        y Población. Toca cualquier área para ver su descripción y, si tiene, expandir
+        sus áreas subordinadas.
+      </p>
+    </div>
+  </section>
+
+  <!-- Organigrama -->
+  <section class="section" aria-label="Estructura organizacional">
+    <div class="container org-layout">
+
+      <div class="org-tree-wrap">
+        <Fragment set:html={organigramaHtml} />
+      </div>
+
+      <aside class="org-panel" id="org-panel" aria-live="polite">
+        <div class="org-panel-empty" id="org-panel-empty">
+          <span class="org-panel-empty-icon" aria-hidden="true">🏛️</span>
+          <p>Selecciona un área del organigrama para ver su descripción.</p>
+        </div>
+        <div class="org-panel-content" id="org-panel-content" hidden>
+          <span class="org-panel-eyebrow">Área seleccionada</span>
+          <h2 class="org-panel-nombre" id="org-panel-nombre"></h2>
+          <p class="org-panel-desc" id="org-panel-desc"></p>
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+</BaseLayout>
+
+<script>
+  function toggleNodoOrg(btn: HTMLElement) {
+    const nombre = btn.getAttribute('data-nombre') || '';
+    const desc   = btn.getAttribute('data-desc') || '';
+    const tieneHijos = btn.getAttribute('data-has-children') === 'true';
+
+    // Marcar nodo activo
+    document.querySelectorAll('.org-node-btn.is-active').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+
+    // Mostrar panel con la info del nodo
+    mostrarPanelOrg(nombre, desc);
+
+    // Expandir / colapsar hijos
+    if (tieneHijos) {
+      const li = btn.closest('.org-item');
+      const childrenUl = li?.querySelector(':scope > .org-children') as HTMLElement | null;
+      const expandido = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expandido));
+      childrenUl?.classList.toggle('is-collapsed', expandido);
+    }
+  }
+
+  function mostrarPanelOrg(nombre: string, descripcion: string) {
+    document.getElementById('org-panel-empty')?.setAttribute('hidden', '');
+    document.getElementById('org-panel-content')?.removeAttribute('hidden');
+
+    const tituloEl = document.getElementById('org-panel-nombre');
+    const descEl   = document.getElementById('org-panel-desc');
+    if (tituloEl) tituloEl.textContent = nombre;
+    if (descEl) descEl.textContent = descripcion;
+
+    if (window.innerWidth < 768) {
+      document.getElementById('org-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // Exponer al scope global porque los botones usan onclick inline
+  (window as any).toggleNodoOrg = toggleNodoOrg;
+</script>
+
+<style>
+  /* Header */
+  .org-hero {
+    background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
+    padding-block: var(--space-16);
+    text-align: center;
+  }
+
+  .org-hero-title {
+    font-size: clamp(1.75rem, 5vw, var(--text-4xl));
+    font-weight: 900;
+    color: var(--color-blanco);
+    margin-block: var(--space-4);
+  }
+
+  .org-hero-desc {
+    color: rgba(255,255,255,0.80);
+    max-width: 60ch;
+    margin-inline: auto;
+    font-size: var(--text-lg);
+    line-height: 1.6;
+  }
+
+  /* Layout general */
+  .org-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .org-layout { grid-template-columns: 1fr 320px; }
+  }
+
+  .org-tree-wrap {
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: clamp(1rem, 4vw, var(--space-8));
+    overflow-x: auto;
+  }
+
+  /* ── Panel lateral ── */
+  .org-panel {
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
+    position: static;
+  }
+
+  @media (min-width: 768px) {
+    .org-panel {
+      position: sticky;
+      top: calc(64px + var(--space-4));
+    }
+  }
+
+  .org-panel-empty {
+    text-align: center;
+    color: var(--color-texto-muted);
+    font-size: var(--text-sm);
+    padding-block: var(--space-4);
+  }
+
+  .org-panel-empty-icon {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: var(--space-3);
+  }
+
+  .org-panel-eyebrow {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-salvia);
+    margin-bottom: var(--space-2);
+  }
+
+  .org-panel-nombre {
+    font-size: var(--text-xl);
+    font-weight: 800;
+    color: var(--color-guinda);
+    margin-bottom: var(--space-3);
+    overflow-wrap: break-word;
+  }
+
+  .org-panel-desc {
+    font-size: var(--text-sm);
+    color: var(--color-texto);
+    line-height: 1.7;
+    overflow-wrap: break-word;
+  }
+
+  /* ══════════════════════════════════════════
+     ÁRBOL — vista de organigrama (desktop)
+     ══════════════════════════════════════════ */
+  .org-tree,
+  .org-children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .org-tree {
+    display: flex;
+    justify-content: center;
+    min-width: max-content;
+  }
+
+  .org-item {
+    position: relative;
+    text-align: center;
+    padding-top: var(--space-8);
+  }
+
+  .org-tree > .org-item {
+    padding-top: 0;
+  }
+
+  /* Línea vertical que conecta con el padre */
+  .org-item:not(.org-root)::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: var(--space-8);
+    background: var(--color-salvia-light);
+    transform: translateX(-50%);
+  }
+
+  .org-children {
+    display: flex;
+    gap: var(--space-8);
+    justify-content: center;
+    padding-top: var(--space-8);
+    position: relative;
+  }
+
+  /* Línea horizontal que une a los hermanos */
+  .org-children::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-salvia-light);
+  }
+
+  .org-children:has(> li:only-child)::before {
+    left: 50%;
+    right: 50%;
+  }
+
+  .org-children.is-collapsed {
+    display: none;
+  }
+
+  .org-node-btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 48px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    line-height: 1.3;
+    max-width: 220px;
+    text-align: left;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .org-node-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .org-node-btn.is-active {
+    border-color: var(--color-rosa);
+    box-shadow: 0 0 0 3px rgba(255,195,208,0.45);
+  }
+
+  .org-node-label { flex: 1; }
+
+  .org-toggle-icon {
+    flex-shrink: 0;
+    display: inline-block;
+    transition: transform var(--transition-fast);
+  }
+
+  .org-node-btn[aria-expanded="false"] .org-toggle-icon {
+    transform: rotate(-90deg);
+  }
+
+  /* Colores por nivel */
+  .org-nivel-0 { background: var(--color-guinda); color: var(--color-blanco); }
+  .org-nivel-1 { background: var(--color-morado); color: var(--color-blanco); }
+  .org-nivel-2 { background: var(--color-salvia); color: var(--color-blanco); }
+  .org-nivel-3 { background: var(--color-rosa-light); color: var(--color-guinda); border-color: var(--color-rosa); }
+
+  /* ══════════════════════════════════════════
+     MÓVIL — lista colapsable vertical
+     ══════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    .org-tree-wrap {
+      overflow-x: visible;
+    }
+
+    .org-tree {
+      display: block;
+      min-width: 0;
+    }
+
+    .org-item {
+      text-align: left;
+      padding-top: var(--space-3);
+      padding-left: var(--space-4);
+    }
+
+    .org-tree > .org-item {
+      padding-left: 0;
+    }
+
+    .org-item:not(.org-root)::before {
+      display: none;
+    }
+
+    .org-children {
+      display: block;
+      padding-top: var(--space-3);
+      padding-left: var(--space-4);
+      border-left: 2px solid var(--color-salvia-light);
+    }
+
+    .org-children::before {
+      display: none;
+    }
+
+    .org-children .org-item + .org-item {
+      margin-top: var(--space-3);
+    }
+
+    .org-node-btn {
+      display: flex;
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  /* Impresión: no aplica aquí, pero mantiene consistencia con el resto del sitio */
+</style>
