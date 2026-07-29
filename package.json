@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Portal Institucional - Subsecretaría de Derechos Humanos y Población de Michoacán",
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
