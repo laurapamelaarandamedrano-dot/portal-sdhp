@@ -623,6 +623,7 @@ const curso = {
     const correcta = Number(btn.getAttribute('data-correcta'));
     const area = btn.closest('.quiz-area');
     const feedback = document.getElementById(`fb-${moduloId}`);
+    const esCorrecta = opcion === correcta;
 
     area?.querySelectorAll('.quiz-opcion').forEach((b, i) => {
       (b as HTMLButtonElement).disabled = true;
@@ -630,16 +631,16 @@ const curso = {
       else if (i === opcion) b.classList.add('opcion-incorrecta');
     });
 
-    const esCorrecta = opcion === correcta;
-
     if (feedback) {
       feedback.removeAttribute('hidden');
       feedback.className = `quiz-feedback quiz-feedback-${esCorrecta ? 'ok' : 'error'}`;
       feedback.innerHTML = esCorrecta
         ? '✅ ¡Correcto! Puedes continuar al siguiente módulo.'
-        : `❌ No es la respuesta correcta, pero puedes continuar. La respuesta correcta está marcada en verde.`;
+        : '💜 No es la respuesta que buscábamos, pero lo importante es seguir aprendiendo. La respuesta correcta está marcada en verde.';
     }
 
+    // El quiz nunca bloquea el avance: responder (bien o mal) siempre
+    // marca el módulo como completado y habilita continuar.
     completados.add(moduloId);
     guardarProgreso(CURSO_ID, moduloId);
     document.getElementById(`check-${moduloId}`)?.removeAttribute('hidden');

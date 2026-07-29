@@ -2,6 +2,13 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase } from '../../utils/url';
 
+const frasesBarra = [
+  'El conocimiento de tus derechos es el primer paso para ejercerlos.',
+  'Formación gratuita. Derechos reales.',
+  'Aprende. Conoce. Ejerce.',
+  'Tú ya eres parte del cambio.',
+];
+
 const cursos = [
   {
     slug: 'introduccion-derechos-humanos',
@@ -71,6 +78,11 @@ const cursos = [
     </div>
   </section>
 
+  <!-- Barra motivacional -->
+  <div class="barra-motivacional" aria-live="polite">
+    <p class="barra-motivacional-texto" id="barra-motivacional-texto">{frasesBarra[0]}</p>
+  </div>
+
   <section class="section" aria-label="Lista de cursos">
     <div class="container">
       <div class="cursos-list">
@@ -112,7 +124,64 @@ const cursos = [
 
 </BaseLayout>
 
+<script>
+  // Debe coincidir con `frasesBarra` en el frontmatter de esta página.
+  const frasesBarra = [
+    'El conocimiento de tus derechos es el primer paso para ejercerlos.',
+    'Formación gratuita. Derechos reales.',
+    'Aprende. Conoce. Ejerce.',
+    'Tú ya eres parte del cambio.',
+  ];
+
+  const elTextoBarra = document.getElementById('barra-motivacional-texto');
+  let indiceBarra = 0;
+
+  function cambiarFraseBarra() {
+    if (!elTextoBarra) return;
+    elTextoBarra.classList.add('is-fading');
+    setTimeout(() => {
+      indiceBarra = (indiceBarra + 1) % frasesBarra.length;
+      elTextoBarra.textContent = frasesBarra[indiceBarra];
+      elTextoBarra.classList.remove('is-fading');
+    }, 300);
+  }
+
+  if (elTextoBarra && frasesBarra.length > 1) {
+    setInterval(cambiarFraseBarra, 5000);
+  }
+</script>
+
 <style>
+  .barra-motivacional {
+    background: var(--color-rosa-light);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .barra-motivacional-texto {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--color-guinda);
+    text-align: center;
+    padding-inline: var(--space-4);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+
+  .barra-motivacional-texto.is-fading {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .barra-motivacional-texto {
+      transition: none;
+    }
+  }
+
   .cursos-hero {
     background: linear-gradient(135deg, var(--color-guinda) 0%, var(--color-morado) 100%);
     padding-block: var(--space-16);

@@ -11,8 +11,12 @@ interface Documento {
   url: string;
 }
 
+// Portal oficial de legislación estatal — se usa para todos los documentos
+// de nivel Estatal (ver más abajo, botón "Ver en CELEM").
+const CELEM_URL = 'https://celem.segob.michoacan.gob.mx/celem/';
+
 // TODO: sustituir 'url: "#"' por el enlace oficial al texto vigente de cada
-// documento (DOF, Congreso de Michoacán, ONU/OEA, etc.) antes de publicar.
+// documento restante (DOF, etc.) antes de publicar.
 // TODO: verificar año de publicación / última reforma vigente en los
 // documentos marcados con anio: null.
 const documentos: Documento[] = [
@@ -24,7 +28,7 @@ const documentos: Documento[] = [
     organismo: 'ONU',
     anio: 1948,
     descripcion: 'Primer reconocimiento global de los derechos y libertades fundamentales inherentes a toda persona.',
-    url: '#',
+    url: 'https://www.un.org/es/about-us/universal-declaration-of-human-rights',
   },
   {
     id: 'cadh',
@@ -33,7 +37,7 @@ const documentos: Documento[] = [
     organismo: 'OEA',
     anio: 1969,
     descripcion: 'Pacto de San José: tratado regional americano que establece derechos civiles y políticos y crea la Corte IDH.',
-    url: '#',
+    url: 'https://www.oas.org/dil/esp/tratados_b-32_convencion_americana_sobre_derechos_humanos.htm',
   },
   {
     id: 'pidcp',
@@ -42,7 +46,7 @@ const documentos: Documento[] = [
     organismo: 'ONU',
     anio: 1966,
     descripcion: 'Obliga a los Estados a respetar derechos como la libertad personal, el debido proceso y la participación política.',
-    url: '#',
+    url: 'https://www.ohchr.org/es/instruments-mechanisms/instruments/international-covenant-civil-and-political-rights',
   },
   {
     id: 'pidesc',
@@ -51,7 +55,7 @@ const documentos: Documento[] = [
     organismo: 'ONU',
     anio: 1966,
     descripcion: 'Reconoce derechos al trabajo, la educación, la salud y un nivel de vida adecuado, de cumplimiento progresivo.',
-    url: '#',
+    url: 'https://www.ohchr.org/es/instruments-mechanisms/instruments/international-covenant-economic-social-and-cultural-rights',
   },
   {
     id: 'cdn',
@@ -60,7 +64,25 @@ const documentos: Documento[] = [
     organismo: 'ONU',
     anio: 1989,
     descripcion: 'Reconoce a niñas, niños y adolescentes como sujetos plenos de derechos y establece su protección especial.',
-    url: '#',
+    url: 'https://www.ohchr.org/es/instruments-mechanisms/instruments/convention-rights-child',
+  },
+  {
+    id: 'cedaw',
+    nivel: 'Internacional',
+    titulo: 'CEDAW — Convención sobre la Eliminación de Todas las Formas de Discriminación contra la Mujer',
+    organismo: 'ONU',
+    anio: 1979,
+    descripcion: 'Establece obligaciones para eliminar la discriminación contra las mujeres en todos los ámbitos de la vida.',
+    url: 'https://www.ohchr.org/es/instruments-mechanisms/instruments/convention-elimination-all-forms-discrimination-against-women',
+  },
+  {
+    id: 'convenio169',
+    nivel: 'Internacional',
+    titulo: 'Convenio 169 de la OIT sobre Pueblos Indígenas y Tribales',
+    organismo: 'OIT',
+    anio: 1989,
+    descripcion: 'Reconoce los derechos de los pueblos indígenas y tribales, incluyendo la consulta previa y la autodeterminación.',
+    url: 'https://www.ilo.org/dyn/normlex/es/f?p=NORMLEXPUB:12100:0::NO::P12100_ILO_CODE:C169',
   },
 
   // ── Federal ──
@@ -78,7 +100,63 @@ const documentos: Documento[] = [
     titulo: 'Ley General de Víctimas',
     anio: 2013,
     descripcion: 'Establece los derechos de las víctimas del delito y de violaciones a derechos humanos, y crea el sistema nacional de atención.',
-    url: '#',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGV.pdf',
+  },
+  {
+    id: 'lgamvlv',
+    nivel: 'Federal',
+    titulo: 'Ley General de Acceso de las Mujeres a una Vida Libre de Violencia',
+    anio: 2007,
+    descripcion: 'Establece los principios y mecanismos para garantizar el acceso de las mujeres a una vida libre de violencia.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGAMVLV.pdf',
+  },
+  {
+    id: 'lfped',
+    nivel: 'Federal',
+    titulo: 'Ley Federal para Prevenir y Eliminar la Discriminación',
+    anio: 2003,
+    descripcion: 'Previene y elimina toda forma de discriminación y promueve la igualdad real de oportunidades.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPED.pdf',
+  },
+  {
+    id: 'lgdnna',
+    nivel: 'Federal',
+    titulo: 'Ley General de los Derechos de Niñas, Niños y Adolescentes',
+    anio: 2014,
+    descripcion: 'Reconoce a niñas, niños y adolescentes como titulares de derechos y regula su protección integral.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGDNNA.pdf',
+  },
+  {
+    id: 'lgipd',
+    nivel: 'Federal',
+    titulo: 'Ley General para la Inclusión de las Personas con Discapacidad',
+    anio: 2011,
+    descripcion: 'Establece las condiciones para la inclusión plena y accesibilidad de las personas con discapacidad.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGIPD.pdf',
+  },
+  {
+    id: 'lgmdfp',
+    nivel: 'Federal',
+    titulo: 'Ley General en Materia de Desaparición Forzada de Personas',
+    anio: 2017,
+    descripcion: 'Regula la búsqueda, localización e investigación de personas desaparecidas.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGMDFP.pdf',
+  },
+  {
+    id: 'amparo',
+    nivel: 'Federal',
+    titulo: 'Ley de Amparo',
+    anio: 2013,
+    descripcion: 'Regula el juicio de amparo, el principal medio de defensa contra actos de autoridad que violen derechos.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LA.pdf',
+  },
+  {
+    id: 'lgs',
+    nivel: 'Federal',
+    titulo: 'Ley General de Salud',
+    anio: null,
+    descripcion: 'Regula el derecho a la protección de la salud reconocido en el artículo 4° constitucional.',
+    url: 'https://www.diputados.gob.mx/LeyesBiblio/pdf/LGS.pdf',
   },
   {
     id: 'lgtaip',
@@ -97,14 +175,14 @@ const documentos: Documento[] = [
     url: '#',
   },
 
-  // ── Estatal ──
+  // ── Estatal (todas remiten al CELEM, portal oficial de legislación del estado) ──
   {
     id: 'cpem',
     nivel: 'Estatal',
     titulo: 'Constitución Política del Estado de Michoacán',
     anio: null,
     descripcion: 'Norma suprema del estado de Michoacán; reconoce y garantiza los derechos humanos en el ámbito local.',
-    url: '#',
+    url: CELEM_URL,
   },
   {
     id: 'ldhem',
@@ -112,7 +190,7 @@ const documentos: Documento[] = [
     titulo: 'Ley de Derechos Humanos del Estado de Michoacán',
     anio: null,
     descripcion: 'Regula la organización y el funcionamiento de la Comisión Estatal de Derechos Humanos (CEDH) de Michoacán.',
-    url: '#',
+    url: CELEM_URL,
   },
   {
     id: 'risg',
@@ -120,7 +198,7 @@ const documentos: Documento[] = [
     titulo: 'Reglamento Interior de la Secretaría de Gobierno',
     anio: null,
     descripcion: 'Define la organización, atribuciones y funcionamiento interno de la Secretaría de Gobierno y sus subsecretarías.',
-    url: '#',
+    url: CELEM_URL,
   },
 ];
 
@@ -189,9 +267,9 @@ const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 
             <h3 class="normativa-titulo">{doc.titulo}</h3>
             <p class="normativa-desc">{doc.descripcion}</p>
             {doc.organismo && <span class="normativa-organismo">{doc.organismo}</span>}
-            <!-- TODO: reemplazar '#' por la URL oficial del texto vigente -->
+            <!-- TODO: los documentos con url:"#" aún no tienen enlace oficial vigente -->
             <a href={doc.url} target="_blank" rel="noopener noreferrer" class="btn btn-secondary normativa-link">
-              Ver texto ↗
+              {doc.nivel === 'Estatal' ? 'Ver en CELEM' : 'Ver texto'} ↗
             </a>
           </article>
         ))}

@@ -1,5 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Portal oficial de legislación estatal.
+const CELEM_URL = 'https://celem.segob.michoacan.gob.mx/celem/';
 ---
 
 <BaseLayout
@@ -78,7 +81,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <div class={`norma-card norma-${n.color}`}>
             <h3 class="norma-nivel">{n.nivel}</h3>
             <ul>
-              {n.normas.map(ley => <li>{ley}</li>)}
+              {n.normas.map(ley => (
+                <li>
+                  {n.nivel === 'Estatal'
+                    ? <a href={CELEM_URL} target="_blank" rel="noopener noreferrer">{ley} <span aria-hidden="true">↗</span></a>
+                    : ley
+                  }
+                </li>
+              ))}
             </ul>
           </div>
         ))}
@@ -194,5 +204,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     position: absolute;
     left: 0;
     color: var(--color-rosa-dark);
+  }
+
+  .norma-card li a {
+    color: var(--color-guinda);
+    font-weight: 600;
+    text-decoration-color: var(--color-rosa-dark);
+  }
+
+  .norma-card li a:hover {
+    color: var(--color-morado);
   }
 </style>
