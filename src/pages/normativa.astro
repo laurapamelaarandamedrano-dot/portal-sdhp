@@ -234,7 +234,6 @@ const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 
             class="normativa-buscador"
             placeholder="Buscar por nombre del documento..."
             aria-label="Buscar por nombre del documento"
-            oninput="buscarNormativa(this.value)"
           />
         </div>
 
@@ -242,9 +241,8 @@ const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 
           {niveles.map((nivel, i) => (
             <button
               type="button"
-              class:list={['filtro-btn', { 'is-active': i === 0 }]}
+              class:list={['filtro-btn', 'js-filtro-nivel', { 'is-active': i === 0 }]}
               data-nivel={nivel}
-              onclick="filtrarNormativa(this)"
             >
               {nivel}
             </button>
@@ -317,9 +315,13 @@ const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 
     aplicarFiltrosNormativa();
   }
 
-  // Exponer al scope global porque los controles usan onclick/oninput inline
-  (window as any).filtrarNormativa = filtrarNormativa;
-  (window as any).buscarNormativa = buscarNormativa;
+  document.querySelectorAll<HTMLButtonElement>('.js-filtro-nivel').forEach(btn => {
+    btn.addEventListener('click', () => filtrarNormativa(btn));
+  });
+
+  document.getElementById('normativa-buscador')?.addEventListener('input', (e) => {
+    buscarNormativa((e.target as HTMLInputElement).value);
+  });
 </script>
 
 <style>
@@ -454,6 +456,10 @@ const niveles: Array<'Todos' | Documento['nivel']> = ['Todos', 'Internacional', 
     box-shadow: var(--shadow-sm);
     padding: var(--space-6);
     transition: all var(--transition-base);
+  }
+
+  .normativa-card[hidden] {
+    display: none;
   }
 
   .normativa-card:hover {

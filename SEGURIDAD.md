@@ -4,7 +4,7 @@ Este documento describe la postura de seguridad del portal institucional de la
 Subsecretaría de Derechos Humanos y Población de Michoacán, para efectos del
 dictamen de ciberseguridad de Gobierno Digital.
 
-**Última actualización:** 2026-07-29.
+**Última actualización:** 2026-07-30.
 
 ## 1. Naturaleza del sitio
 
@@ -29,47 +29,71 @@ Se definieron las siguientes cabeceras/directivas:
 
 | Cabecera | Valor | Por qué |
 |---|---|---|
-| `Content-Security-Policy` | solo `'self'` + Google Fonts (ver detalle abajo) | Limita de qué orígenes puede cargar scripts, estilos y fuentes, mitigando XSS e inyección de recursos externos maliciosos. |
+| `Content-Security-Policy` | `'self'` + hashes SHA-256 por página (ver detalle abajo) | Limita de qué orígenes puede cargar scripts, estilos y fuentes, mitigando XSS e inyección de recursos externos maliciosos. |
 | `X-Frame-Options` | `DENY` | Evita que el sitio se embeba en un `<iframe>` ajeno (clickjacking). |
 | `X-Content-Type-Options` | `nosniff` | Evita que el navegador "adivine" el tipo de contenido de un archivo, mitigando ataques de MIME-sniffing. |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Evita filtrar la URL completa (con posibles parámetros) a sitios externos al seguir un enlace. |
 | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | El sitio no necesita cámara, micrófono ni geolocalización; se deshabilitan explícitamente aunque nunca se pidan. |
 
+**CSP — usamos el soporte nativo de Astro, no un `<meta>` escrito a mano.**
+Astro (desde v6) puede generar por sí mismo, en cada build, una CSP con
+hashes SHA-256 exactos del contenido que esa página en particular inlinea
+(`security.csp` en `astro.config.mjs`). Esto reemplazó una primera versión
+manual que escribíamos nosotros mismos como `<meta>` fijo: esa versión se
+rompió en producción cuando una actualización de Astro empezó a inlinear
+scripts que antes iban en archivos externos (el `script-src 'self'` sin
+`unsafe-inline` los bloqueaba silenciosamente — sin esto, el carrusel de
+frases y algunos botones dejaron de responder). La versión nativa de Astro
+se genera de nuevo en cada `npm run build`, así que no se vuelve a romper
+si una futura versión de Astro decide inlinear algo distinto.
+
+`style-src` permite `'unsafe-inline'`, pero **acotado solo a atributos**
+(`kind: 'attribute'`, ver `astro.config.mjs`) — el sitio usa bastantes
+atributos `style=""` estáticos (barras de progreso, colores dinámicos del
+organigrama). Las hojas de estilo (`<style>`, `.css`) siguen restringidas a
+`'self'` + hashes, sin excepción. `script-src` **no** tiene ninguna
+excepción de `unsafe-inline`/`unsafe-hashes`: todo el JavaScript del sitio
+se conecta con `addEventListener` (nunca `onclick=""` inline), así que no
+necesitamos debilitar esa directiva en absoluto.
+
 **Limitación importante — léase con atención:** GitHub Pages **no permite
 configurar cabeceras HTTP personalizadas**; no hay servidor propio que las
-envíe. Por eso estas cabeceras existen en tres lugares distintos, con
-distinto alcance real:
+envíe. Por eso las cabeceras de la tabla existen en varios lugares
+distintos, con distinto alcance real:
 
-1. **`astro.config.mjs` (`server.headers`)** — se aplican solo cuando alguien
-   corre `npm run dev` o `npm run preview` en su máquina. Útil para desarrollo,
-   **sin efecto en producción**. Aquí `script-src` sí incluye `'unsafe-inline'`
-   porque el cliente de HMR de Vite inyecta un script inline al arrancar el
-   dev server; sin esa excepción la página queda en blanco en `astro dev`. La
-   CSP de producción (punto 3) no tiene esta excepción.
-2. **`public/_headers`** — formato estándar de Netlify/Cloudflare Pages.
-   GitHub Pages no lo lee. Queda listo para el día que el sitio se migre a un
-   host que sí lo soporte, o se coloque un proxy (p. ej. Cloudflare gratuito)
-   delante de GitHub Pages.
-3. **`<meta http-equiv="...">` en `BaseLayout.astro`** — de las cinco
-   cabeceras de la tabla, **solo `Content-Security-Policy` y `Referrer-Policy`
-   pueden entregarse vía `<meta>`** y sí tienen efecto real en el sitio
-   publicado hoy en GitHub Pages. `X-Frame-Options`, `X-Content-Type-Options`
-   y `Permissions-Policy` **no** tienen equivalente en `<meta>` — los
-   navegadores los ignoran ahí por diseño. Mientras el sitio siga en GitHub
-   Pages sin proxy, esas tres cabeceras **no están activas en producción**;
-   solo quedan documentadas/preparadas en `public/_headers`.
+1. **CSP de producción (`<meta>` auto-generado por Astro, punto anterior)**
+   — es la que de verdad ve un visitante. Solo se genera en `build`/`preview`,
+   no en `dev` (ver punto 2).
+2. **`astro.config.mjs` (`server.headers`)** — cabeceras aparte que solo
+   aplican cuando alguien corre `npm run dev` en su máquina (la CSP nativa de
+   Astro no funciona en modo dev). Aquí `script-src` sí incluye
+   `'unsafe-inline'` porque el cliente de HMR de Vite inyecta un script
+   inline al arrancar el dev server; sin esa excepción la página queda en
+   blanco en `astro dev`. Sin efecto en producción.
+3. **`public/_headers`** — formato estándar de Netlify/Cloudflare Pages, para
+   `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy` y
+   `Permissions-Policy` (**sin** CSP: un valor único y estático no puede
+   incluir los hashes correctos de cada página). GitHub Pages no lo lee;
+   queda listo para el día que el sitio se migre a un host que sí lo
+   soporte, o se coloque un proxy (p. ej. Cloudflare gratuito) delante de
+   GitHub Pages.
+4. **`<meta http-equiv="Referrer-Policy">` en `BaseLayout.astro`** — de las
+   cuatro cabeceras restantes, **solo esta** puede entregarse vía `<meta>` y
+   sí tiene efecto real en el sitio publicado hoy en GitHub Pages.
+   `X-Frame-Options`, `X-Content-Type-Options` y `Permissions-Policy` **no**
+   tienen equivalente en `<meta>` — los navegadores los ignoran ahí por
+   diseño. Mientras el sitio siga en GitHub Pages sin proxy, esas tres
+   cabeceras **no están activas en producción**; solo quedan
+   documentadas/preparadas en `public/_headers`.
 
-Recomendación concreta si se necesita que las cinco cabeceras apliquen de
+Recomendación concreta si se necesita que todas las cabeceras apliquen de
 verdad en producción: poner el dominio detrás de Cloudflare (plan gratuito)
 y configurar un "Transform Rule" o "Response Header" ahí, o migrar el
 hosting a Netlify/Cloudflare Pages (que sí leen `public/_headers`).
 
 La CSP permite explícitamente Google Fonts (`fonts.googleapis.com` para el
 CSS, `fonts.gstatic.com` para los archivos de fuente) porque es el único
-recurso de terceros que carga el sitio. Incluye `'unsafe-inline'` en
-`style-src` porque el sitio usa atributos `style=""` inline en varios
-componentes (barras de progreso, colores dinámicos del organigrama, etc.);
-no hay `'unsafe-inline'` en `script-src`.
+recurso de terceros que carga el sitio.
 
 ### 2.2 Formulario de contacto
 

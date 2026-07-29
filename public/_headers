@@ -9,8 +9,14 @@
 # completo de qué protege cada cabecera y cómo aplicarlas mientras el
 # sitio siga en GitHub Pages.
 
+# Content-Security-Policy NO va aquí: cada página lleva su propia CSP con
+# hashes SHA-256 específicos (generados por Astro en cada build vía
+# `security.csp` en astro.config.mjs) inyectada directamente en su <head>.
+# Un valor único y estático en este archivo no podría incluir los hashes
+# correctos de cada página, así que declarar una CSP aquí rompería el sitio
+# en cualquier host que sí lea este archivo. Ver SEGURIDAD.md.
+
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
