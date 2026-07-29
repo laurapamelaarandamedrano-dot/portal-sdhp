@@ -4,7 +4,7 @@ Este documento describe la postura de seguridad del portal institucional de la
 Subsecretaría de Derechos Humanos y Población de Michoacán, para efectos del
 dictamen de ciberseguridad de Gobierno Digital.
 
-**Última actualización:** 2026-07-28.
+**Última actualización:** 2026-07-29.
 
 ## 1. Naturaleza del sitio
 
@@ -42,7 +42,10 @@ distinto alcance real:
 
 1. **`astro.config.mjs` (`server.headers`)** — se aplican solo cuando alguien
    corre `npm run dev` o `npm run preview` en su máquina. Útil para desarrollo,
-   **sin efecto en producción**.
+   **sin efecto en producción**. Aquí `script-src` sí incluye `'unsafe-inline'`
+   porque el cliente de HMR de Vite inyecta un script inline al arrancar el
+   dev server; sin esa excepción la página queda en blanco en `astro dev`. La
+   CSP de producción (punto 3) no tiene esta excepción.
 2. **`public/_headers`** — formato estándar de Netlify/Cloudflare Pages.
    GitHub Pages no lo lee. Queda listo para el día que el sitio se migre a un
    host que sí lo soporte, o se coloque un proxy (p. ej. Cloudflare gratuito)
@@ -108,6 +111,30 @@ correo, ni ningún otro dato identificable.** El nombre que se escribe para
 la constancia PDF vive solo en memoria/DOM mientras la página está abierta
 (vía `textContent`, nunca `innerHTML`) y se descarta al cerrar o recargar la
 pestaña; no se persiste en ningún almacenamiento del navegador.
+
+### 2.5 Constancia de curso en PDF
+
+La constancia del Curso 1 se genera **100% en el navegador**, sin backend ni
+servicio externo:
+
+- **Librerías:** `jsPDF` + `html2canvas` (ambas cliente-only, sin llamadas de
+  red). El botón de descarga solo se muestra si la calificación final del
+  curso (aciertos de los 6 quizzes) es de al menos 80% — si no, se invita a
+  repasar y reintentar los quizzes fallados, sin exponer ningún botón de
+  descarga.
+- **Nombre del participante:** se filtra en cada tecla a solo letras, espacios
+  y acentos (`sanitizarNombreEntrada`), con tope de 100 caracteres, y se
+  inserta en el DOM siempre vía `textContent` — nunca `innerHTML` con el
+  valor del usuario. Se probó explícitamente con una entrada tipo
+  `<script>alert(1)</script>`: el resultado se renderiza como texto plano
+  inocuo, sin ejecutar nada.
+- **Nombre del archivo descargado:** se deriva del nombre sanitizado
+  (`sanitizarNombreArchivo`), quitando acentos y cualquier carácter que no
+  sea letra o número, para evitar problemas con el sistema de archivos.
+- **Folio:** un hash corto (`hashCorto`) calculado localmente a partir del
+  nombre + la fecha/hora exacta de la descarga — no es criptográfico, no
+  identifica a la persona por sí solo, y no depende de ningún servicio
+  externo.
 
 ## 3. Qué NO hace este sitio
 
