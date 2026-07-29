@@ -518,57 +518,86 @@ const curso = {
         <!-- Pantalla de constancia -->
         <div id="pantalla-constancia" hidden>
           <div class="constancia-hero">
-            <div class="constancia-icon" aria-hidden="true">🏆</div>
-            <h2>¡Felicidades, lo lograste!</h2>
+            <div class="constancia-icon" aria-hidden="true" id="constancia-icon">🏆</div>
+            <h2 id="constancia-titulo">¡Felicidades, lo lograste!</h2>
             <p>Completaste el curso <strong>{NOMBRE_CONSTANCIA}</strong>.</p>
-            <p>Escribe tu nombre abajo y descarga tu constancia.</p>
-            <div class="constancia-actions">
-              <button class="btn btn-primary js-imprimir-constancia">
+            <p class="constancia-calificacion" id="constancia-calificacion"></p>
+
+            <!-- Se muestra solo si la calificación final es >= 80% -->
+            <div class="constancia-actions" id="constancia-actions" hidden>
+              <button type="button" class="btn btn-primary js-descargar-constancia">
                 📄 Descargar constancia PDF
               </button>
               <a href={withBase('/cursos')} class="btn btn-secondary">Ver más cursos</a>
             </div>
+
+            <!-- Se muestra solo si la calificación final es < 80% -->
+            <div class="constancia-reintentar" id="constancia-reintentar" hidden>
+              <p>
+                Necesitas al menos <strong>80% de aciertos</strong> en los quizzes para obtener
+                tu constancia. Vuelve a los módulos donde fallaste, presiona
+                "↺ Intentar de nuevo" en el quiz y contesta otra vez — no perderás tu avance.
+              </p>
+              <button type="button" class="btn btn-secondary js-ir-modulo" data-target="1">
+                Repasar desde el módulo 1
+              </button>
+            </div>
           </div>
 
-          <div class="constancia-nombre-form">
-            <label for="nombre-constancia" class="form-label">¿A nombre de quién es la constancia?</label>
-            <input
-              type="text"
-              id="nombre-constancia"
-              class="form-input"
-              placeholder="Escribe tu nombre completo"
-              autocomplete="off"
-              style="max-width:400px"
-            />
-            <span class="form-hint">Este dato solo se usa para imprimir tu constancia; no se guarda en ningún lado.</span>
-          </div>
+          <!-- Se muestra solo si la calificación final es >= 80% -->
+          <div id="constancia-descarga-zona" hidden>
+            <div class="constancia-nombre-form">
+              <label for="nombre-constancia" class="form-label">¿A nombre de quién es la constancia?</label>
+              <input
+                type="text"
+                id="nombre-constancia"
+                class="form-input"
+                placeholder="Escribe tu nombre completo"
+                autocomplete="off"
+                maxlength="100"
+                inputmode="text"
+                style="max-width:400px"
+              />
+              <span class="form-hint">Solo letras, espacios y acentos, máximo 100 caracteres. Este dato solo se usa para tu constancia; no se guarda en ningún lado.</span>
+            </div>
 
-          <!-- Vista previa constancia -->
-          <div class="constancia-preview-scroll">
-            <div class="constancia-preview" id="constancia-preview">
-              <div class="const-header">
-                <div class="const-logo-area">
-                  <div class="const-escudo" aria-hidden="true">🏛</div>
-                  <div>
-                    <div class="const-inst">Subsecretaría de Derechos Humanos y Población</div>
-                    <div class="const-gov">Gobierno de Michoacán</div>
+            <!-- Vista previa constancia: orientación horizontal, proporción tipo diploma -->
+            <div class="constancia-preview-scroll">
+              <div class="constancia-preview" id="constancia-preview">
+                <div class="const-header">
+                  <div class="const-logo-area">
+                    <div class="const-escudo" aria-hidden="true">🏛</div>
+                    <div>
+                      <div class="const-inst">Subsecretaría de Derechos Humanos y Población</div>
+                      <div class="const-gov">Gobierno de Michoacán</div>
+                    </div>
+                  </div>
+                  <div class="const-sello" aria-hidden="true">DDHH<br />MICH</div>
+                </div>
+
+                <p class="const-titulo-doc">Constancia de Participación</p>
+
+                <div class="const-body">
+                  <div class="const-body-principal">
+                    <p class="const-texto-certifica">Se otorga la presente constancia a:</p>
+                    <p class="const-nombre" id="const-nombre">_____________________</p>
+                    <p class="const-texto">por haber completado satisfactoriamente el</p>
+                    <p class="const-curso">{NOMBRE_CONSTANCIA}</p>
+                  </div>
+
+                  <div class="const-body-datos">
+                    <p class="const-fecha" id="const-fecha"></p>
+                    <p class="const-calificacion" id="const-calificacion"></p>
+
+                    <div class="const-firma">
+                      <div class="const-firma-linea"></div>
+                      <p class="const-firma-titulo">Subsecretario de Derechos Humanos y Población</p>
+                      <p class="const-firma-sub">Gobierno del Estado de Michoacán</p>
+                    </div>
+
+                    <p class="const-folio" id="const-folio"></p>
                   </div>
                 </div>
-              </div>
-              <div class="const-body">
-                <p class="const-texto-certifica">Se otorga la presente constancia a:</p>
-                <p class="const-nombre" id="const-nombre">_____________________</p>
-                <p class="const-texto">por haber completado satisfactoriamente el</p>
-                <p class="const-curso">{NOMBRE_CONSTANCIA}</p>
-                <p class="const-fecha" id="const-fecha"></p>
-
-                <div class="const-firma">
-                  <div class="const-firma-linea"></div>
-                  <p class="const-firma-titulo">Subsecretario de Derechos Humanos y Población</p>
-                  <p class="const-firma-sub">Gobierno del Estado de Michoacán</p>
-                </div>
-
-                <p class="const-folio" id="const-folio"></p>
               </div>
             </div>
           </div>
@@ -581,11 +610,18 @@ const curso = {
 </BaseLayout>
 
 <script>
-  import { guardarProgreso, obtenerProgreso, limpiarProgreso } from '../../utils/cursoStorage.js';
+  import { guardarProgreso, obtenerProgreso, obtenerCorrectas, limpiarProgreso } from '../../utils/cursoStorage.js';
+  import { jsPDF } from 'jspdf';
+  import html2canvas from 'html2canvas';
 
   const CURSO_ID = 'intro';
   const totalModulos = 6;
+  const CALIFICACION_MINIMA = 80;
+  // Debe coincidir con NOMBRE_CONSTANCIA en el frontmatter de esta página
+  // (el <script> del cliente no puede leer variables del frontmatter).
+  const NOMBRE_CONSTANCIA = 'Curso Básico de Derechos Humanos';
   let completados = new Set<number>();
+  let correctas = new Set<number>();
   let moduloActual = 1;
 
   function irModulo(id: number) {
@@ -634,19 +670,47 @@ const curso = {
     if (feedback) {
       feedback.removeAttribute('hidden');
       feedback.className = `quiz-feedback quiz-feedback-${esCorrecta ? 'ok' : 'error'}`;
-      feedback.innerHTML = esCorrecta
+      // Construido con texto plano (no innerHTML con datos externos): el
+      // contenido aquí es siempre fijo, nunca proviene del usuario.
+      feedback.textContent = '';
+      const textoSpan = document.createElement('span');
+      textoSpan.textContent = esCorrecta
         ? '✅ ¡Correcto! Puedes continuar al siguiente módulo.'
         : '💜 No es la respuesta que buscábamos, pero lo importante es seguir aprendiendo. La respuesta correcta está marcada en verde.';
+      feedback.appendChild(textoSpan);
+
+      const btnReintentar = document.createElement('button');
+      btnReintentar.type = 'button';
+      btnReintentar.className = 'quiz-reintentar-btn';
+      btnReintentar.textContent = '↺ Intentar de nuevo';
+      btnReintentar.addEventListener('click', () => reintentarQuiz(moduloId));
+      feedback.appendChild(btnReintentar);
     }
 
     // El quiz nunca bloquea el avance: responder (bien o mal) siempre
-    // marca el módulo como completado y habilita continuar.
+    // marca el módulo como completado y habilita continuar. La calificación
+    // final (para la constancia) sí distingue aciertos de errores.
     completados.add(moduloId);
-    guardarProgreso(CURSO_ID, moduloId);
+    if (esCorrecta) correctas.add(moduloId);
+    else correctas.delete(moduloId);
+    guardarProgreso(CURSO_ID, moduloId, esCorrecta);
     document.getElementById(`check-${moduloId}`)?.removeAttribute('hidden');
     document.getElementById(`siguiente-${moduloId}`)?.removeAttribute('disabled');
 
     actualizarProgreso();
+  }
+
+  function reintentarQuiz(moduloId: number) {
+    const area = document.getElementById(`quiz-${moduloId}`);
+    area?.querySelectorAll<HTMLButtonElement>('.quiz-opcion').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('opcion-correcta', 'opcion-incorrecta');
+    });
+    document.getElementById(`fb-${moduloId}`)?.setAttribute('hidden', '');
+  }
+
+  function calificacionFinal(): number {
+    return Math.round((correctas.size / totalModulos) * 100);
   }
 
   function actualizarProgreso() {
@@ -664,27 +728,144 @@ const curso = {
     document.querySelectorAll('.modulo-card').forEach(el => el.setAttribute('hidden', ''));
     document.getElementById('pantalla-constancia')?.removeAttribute('hidden');
 
-    const fecha = new Date().toLocaleDateString('es-MX', {
-      year: 'numeric', month: 'long', day: 'numeric',
-    });
-    const elFecha = document.getElementById('const-fecha');
-    if (elFecha) elFecha.textContent = `Michoacán, ${fecha}`;
+    const calificacion = calificacionFinal();
+    const aprobo = calificacion >= CALIFICACION_MINIMA;
 
-    // Folio único de la constancia — no identifica a la persona, solo el momento de emisión.
-    const elFolio = document.getElementById('const-folio');
-    if (elFolio) elFolio.textContent = `Folio: ${Date.now()}`;
+    const elCalificacionHero = document.getElementById('constancia-calificacion');
+    if (elCalificacionHero) elCalificacionHero.textContent = `Tu calificación final: ${calificacion}% de aciertos`;
+
+    const elTitulo = document.getElementById('constancia-titulo');
+    if (elTitulo) elTitulo.textContent = aprobo ? '¡Felicidades, lo lograste!' : 'Ya casi lo logras';
+
+    const elIcono = document.getElementById('constancia-icon');
+    if (elIcono) elIcono.textContent = aprobo ? '🏆' : '💪';
+
+    // La descarga (y todo lo necesario para generarla) solo se muestra si
+    // la calificación final alcanza el mínimo requerido.
+    document.getElementById('constancia-actions')?.toggleAttribute('hidden', !aprobo);
+    document.getElementById('constancia-descarga-zona')?.toggleAttribute('hidden', !aprobo);
+    document.getElementById('constancia-reintentar')?.toggleAttribute('hidden', aprobo);
+
+    if (aprobo) {
+      // Fecha y calificación se muestran de inmediato en la vista previa.
+      // El folio se genera aparte, al momento de descargar (incorpora el
+      // nombre exacto que la persona haya escrito en ese momento).
+      const fecha = new Date().toLocaleDateString('es-MX', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+      const elFecha = document.getElementById('const-fecha');
+      if (elFecha) elFecha.textContent = `Michoacán, ${fecha}`;
+
+      const elCalificacion = document.getElementById('const-calificacion');
+      if (elCalificacion) elCalificacion.textContent = `Calificación obtenida: ${calificacion}%`;
+
+      const elFolio = document.getElementById('const-folio');
+      if (elFolio) elFolio.textContent = 'Folio: se genera al descargar';
+    }
 
     document.getElementById('pantalla-constancia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  // Permite solo letras (con acentos), espacios y ñ; recorta a 100 caracteres.
+  function sanitizarNombreEntrada(valor: string): string {
+    return valor.replace(/[^A-Za-zÀ-ÿ\s]/g, '').slice(0, 100);
+  }
+
   function actualizarNombre(valor: string) {
-    // Solo se refleja en pantalla (textContent, sin HTML) — nunca se guarda en localStorage.
+    // Solo se refleja en pantalla vía textContent (nunca innerHTML con datos
+    // del usuario) y nunca se guarda en localStorage ni se envía a ningún lado.
     const el = document.getElementById('const-nombre');
     if (el) el.textContent = valor || '_____________________';
   }
 
-  function imprimirConstancia() {
-    window.print();
+  // Hash corto y determinístico (no criptográfico) para el folio — no
+  // depende de ningún servicio externo, solo corre en el navegador.
+  function hashCorto(texto: string): string {
+    let hash = 0;
+    for (let i = 0; i < texto.length; i++) {
+      hash = (hash * 31 + texto.charCodeAt(i)) >>> 0;
+    }
+    return hash.toString(36).toUpperCase();
+  }
+
+  // Quita acentos y cualquier carácter que no sea letra/número, para usarlo
+  // en el nombre del archivo descargado.
+  function sanitizarNombreArchivo(texto: string): string {
+    return texto
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase() || 'constancia';
+  }
+
+  async function descargarConstanciaPDF() {
+    const boton = document.querySelector<HTMLButtonElement>('.js-descargar-constancia');
+    const nombreInput = document.getElementById('nombre-constancia') as HTMLInputElement | null;
+    const nombre = sanitizarNombreEntrada(nombreInput?.value ?? '').trim();
+
+    if (!nombre) {
+      window.alert('Por favor escribe tu nombre antes de descargar la constancia.');
+      nombreInput?.focus();
+      return;
+    }
+
+    // Folio local (hash corto de nombre + fecha + momento exacto) — no
+    // identifica a la persona por sí solo y no llama a ningún servicio externo.
+    // (Fecha y calificación ya se muestran desde generarConstancia(); aquí
+    // solo se genera el folio, que sí depende del nombre exacto tecleado.)
+    const ahora = new Date();
+    const folio = hashCorto(`${nombre}|${ahora.toISOString()}|${Date.now()}`);
+    const elFolio = document.getElementById('const-folio');
+    if (elFolio) elFolio.textContent = `Folio: ${folio}`;
+
+    const elemento = document.getElementById('constancia-preview');
+    if (!elemento) return;
+
+    const textoOriginalBoton = boton?.textContent ?? '📄 Descargar constancia PDF';
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Generando PDF...';
+    }
+
+    try {
+      const canvas = await html2canvas(elemento, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+      });
+
+      // JPEG con buena calidad en vez de PNG: el certificado no tiene
+      // transparencias y así el PDF pesa una fracción de lo que pesaría en PNG.
+      const imagenDatos = canvas.toDataURL('image/jpeg', 0.92);
+
+      // Orientación horizontal, proporción tipo diploma (A4 landscape).
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const anchoPagina = pdf.internal.pageSize.getWidth();
+      const altoPagina = pdf.internal.pageSize.getHeight();
+      const margen = 10;
+
+      const relacion = canvas.width / canvas.height;
+      let anchoImagen = anchoPagina - margen * 2;
+      let altoImagen = anchoImagen / relacion;
+      if (altoImagen > altoPagina - margen * 2) {
+        altoImagen = altoPagina - margen * 2;
+        anchoImagen = altoImagen * relacion;
+      }
+      const x = (anchoPagina - anchoImagen) / 2;
+      const y = (altoPagina - altoImagen) / 2;
+
+      pdf.addImage(imagenDatos, 'JPEG', x, y, anchoImagen, altoImagen);
+
+      const nombreArchivo = `constancia-${sanitizarNombreArchivo(NOMBRE_CONSTANCIA)}-${sanitizarNombreArchivo(nombre)}.pdf`;
+      pdf.save(nombreArchivo);
+    } catch (error) {
+      console.error('Error generando la constancia en PDF:', error);
+      window.alert('Ocurrió un problema generando tu constancia. Por favor intenta de nuevo.');
+    } finally {
+      if (boton) {
+        boton.disabled = false;
+        boton.textContent = textoOriginalBoton;
+      }
+    }
   }
 
   function reiniciarCurso() {
@@ -693,6 +874,7 @@ const curso = {
 
     limpiarProgreso(CURSO_ID);
     completados.clear();
+    correctas.clear();
 
     document.querySelectorAll('.modulo-check').forEach(el => el.setAttribute('hidden', ''));
     document.querySelectorAll<HTMLButtonElement>('.modulo-siguiente').forEach(btn => btn.setAttribute('disabled', ''));
@@ -712,6 +894,7 @@ const curso = {
     document.getElementById(`check-${moduloId}`)?.removeAttribute('hidden');
     document.getElementById(`siguiente-${moduloId}`)?.removeAttribute('disabled');
   });
+  obtenerCorrectas(CURSO_ID).forEach(moduloId => correctas.add(moduloId));
   actualizarProgreso();
 
   // ── Wiring de eventos (sin onclick/oninput inline: este <script> es un
@@ -730,12 +913,15 @@ const curso = {
     btn.addEventListener('click', generarConstancia);
   });
 
-  document.querySelectorAll<HTMLButtonElement>('.js-imprimir-constancia').forEach(btn => {
-    btn.addEventListener('click', imprimirConstancia);
+  document.querySelectorAll<HTMLButtonElement>('.js-descargar-constancia').forEach(btn => {
+    btn.addEventListener('click', () => { void descargarConstanciaPDF(); });
   });
 
   document.getElementById('nombre-constancia')?.addEventListener('input', (e) => {
-    actualizarNombre((e.target as HTMLInputElement).value);
+    const input = e.target as HTMLInputElement;
+    const limpio = sanitizarNombreEntrada(input.value);
+    if (limpio !== input.value) input.value = limpio;
+    actualizarNombre(limpio);
   });
 
   document.getElementById('btn-reiniciar-curso')?.addEventListener('click', reiniciarCurso);
@@ -1435,6 +1621,32 @@ const curso = {
     font-size: var(--text-sm);
     overflow-wrap: break-word;
     word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .quiz-feedback[hidden] {
+    display: none;
+  }
+
+  .quiz-reintentar-btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 2px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .quiz-reintentar-btn:hover {
+    background: rgba(0,0,0,0.06);
   }
 
   :global(.quiz-feedback-ok) {
@@ -1508,12 +1720,40 @@ const curso = {
     overflow-wrap: break-word;
   }
 
+  .constancia-calificacion {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--text-xl);
+    color: var(--color-guinda);
+  }
+
+  .constancia-reintentar {
+    margin-top: var(--space-8);
+    padding: var(--space-6);
+    background: var(--color-fondo-alt);
+    border: 2px solid var(--color-salvia-light);
+    border-radius: var(--radius-lg);
+  }
+
+  .constancia-reintentar p {
+    font-size: var(--text-base);
+    color: var(--color-texto);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+  }
+
   .constancia-actions {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     justify-content: center;
     margin-top: var(--space-8);
+  }
+
+  /* El atributo [hidden] no gana por especificidad frente a `display: flex`
+     de arriba, así que hay que forzarlo explícitamente. */
+  .constancia-actions[hidden] {
+    display: none;
   }
 
   .constancia-actions .btn {
@@ -1554,42 +1794,93 @@ const curso = {
     margin-bottom: var(--space-8);
   }
 
-  /* Constancia visual */
+  /* Constancia visual — orientación horizontal, proporción tipo diploma
+     (similar a A4 landscape: ~1.41:1) */
   .constancia-preview {
     background: var(--color-blanco);
-    border: 3px solid var(--color-guinda);
-    border-radius: var(--radius-lg);
-    padding: clamp(1.5rem, 6vw, var(--space-8));
+    background-image:
+      linear-gradient(135deg, rgba(74,0,31,0.04) 0%, transparent 30%),
+      linear-gradient(-45deg, rgba(106,15,73,0.04) 0%, transparent 30%);
+    border: 10px solid var(--color-guinda);
+    outline: 2px solid var(--color-rosa);
+    outline-offset: -18px;
+    border-radius: var(--radius-md);
+    padding: clamp(1.5rem, 4vw, var(--space-8)) clamp(1.5rem, 5vw, var(--space-12));
     text-align: center;
     width: 100%;
-    max-width: 600px;
-    min-width: 480px;
+    max-width: 900px;
+    min-width: 640px;
+    aspect-ratio: 1.41 / 1;
     margin-inline: auto;
     box-shadow: var(--shadow-md);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  .const-header { margin-bottom: var(--space-6); }
+  .const-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
 
   .const-logo-area {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: var(--space-4);
+    gap: var(--space-3);
+    text-align: left;
   }
 
-  .const-escudo { font-size: 3rem; }
+  .const-escudo { font-size: 2.5rem; }
   .const-inst {
     font-family: var(--font-display);
     font-weight: 800;
     font-size: var(--text-sm);
     color: var(--color-guinda);
+    max-width: 30ch;
   }
   .const-gov {
     font-size: var(--text-xs);
     color: var(--color-salvia);
   }
 
-  .const-body { padding-block: var(--space-6); }
+  .const-sello {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: var(--text-xs);
+    line-height: 1.2;
+    color: var(--color-rosa-dark);
+    border: 2px solid var(--color-rosa);
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .const-titulo-doc {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(1.25rem, 3vw, var(--text-2xl));
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-morado);
+    margin-bottom: var(--space-4);
+  }
+
+  .const-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    flex: 1;
+    justify-content: center;
+  }
+
+  .const-body-principal { flex: 1; }
 
   .const-texto-certifica {
     font-family: var(--font-display);
@@ -1603,13 +1894,15 @@ const curso = {
 
   .const-nombre {
     font-family: var(--font-display);
-    font-size: var(--text-3xl);
+    font-size: clamp(1.5rem, 4vw, var(--text-3xl));
     font-weight: 900;
     color: var(--color-guinda);
     margin-bottom: var(--space-4);
     border-bottom: 2px solid var(--color-guinda);
     padding-bottom: var(--space-2);
     min-height: 50px;
+    max-width: 32ch;
+    margin-inline: auto;
     overflow-wrap: break-word;
   }
 
@@ -1624,21 +1917,39 @@ const curso = {
     font-size: var(--text-xl);
     font-weight: 800;
     color: var(--color-guinda);
-    margin-bottom: var(--space-4);
     overflow-wrap: break-word;
   }
 
-  .const-fecha {
+  .const-body-datos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    border-top: 1px solid var(--color-salvia-light);
+    padding-top: var(--space-4);
+    text-align: left;
+  }
+
+  .const-fecha,
+  .const-calificacion {
     font-size: var(--text-sm);
     color: var(--color-texto-muted);
+    white-space: nowrap;
+  }
+
+  .const-calificacion {
+    font-family: var(--font-display);
+    font-weight: 800;
+    color: var(--color-guinda);
   }
 
   .const-firma {
-    margin-top: var(--space-8);
+    text-align: center;
   }
 
   .const-firma-linea {
-    width: 220px;
+    width: 180px;
     height: 1px;
     background: var(--color-guinda);
     opacity: 0.5;
@@ -1648,7 +1959,7 @@ const curso = {
   .const-firma-titulo {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: var(--text-sm);
+    font-size: var(--text-xs);
     color: var(--color-guinda);
   }
 
@@ -1658,55 +1969,22 @@ const curso = {
   }
 
   .const-folio {
-    margin-top: var(--space-6);
     font-size: var(--text-xs);
     color: var(--color-salvia);
     font-family: monospace;
     letter-spacing: 0.05em;
+    white-space: nowrap;
   }
 
-  /* ══════════════════════════════════════════
-     IMPRESIÓN — constancia en página completa
-     ══════════════════════════════════════════ */
-  @media print {
-    @page {
-      size: landscape;
-      margin: 0;
-    }
-
-    html, body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-
-    header, footer,
-    .curso-hero, .modulos-sidebar, .modulo-card,
-    .constancia-hero, .constancia-nombre-form,
-    .quiz-area, .modulo-nav, .curso-back {
-      display: none !important;
-    }
-
-    .constancia-preview-scroll {
-      overflow: visible;
-      margin: 0;
-    }
-
-    .constancia-preview {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-      width: 100vw;
-      height: 100vh;
-      max-width: none;
-      min-width: 0;
-      margin: 0;
-      border: 12px solid var(--color-guinda);
-      box-shadow: none;
-      border-radius: 0;
-      display: flex;
+  @media (max-width: 700px) {
+    .const-body-datos {
       flex-direction: column;
-      justify-content: center;
-      background: var(--color-blanco);
-      page-break-inside: avoid;
+      align-items: center;
+      text-align: center;
     }
   }
+
+  /* La constancia ahora se descarga como PDF real (jsPDF + html2canvas),
+     no vía diálogo de impresión del navegador — por eso ya no hay CSS
+     @media print aquí. */
 </style>
